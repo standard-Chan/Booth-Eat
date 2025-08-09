@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import Modal from '../common/Modal.jsx';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import Modal from "../common/Modal.jsx";
 
 export default function FoodDetailModal({ open, item, onClose, onAdd }) {
   const [qty, setQty] = useState(1);
@@ -27,9 +27,11 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
 
       {item.imageUrl && <Hero src={item.imageUrl} alt={item.name} />}
 
-      {item.badge && <Badge>{item.badge}</Badge>}
-      <Name>{item.name}</Name>
-      {item.description && <Desc>{item.description}</Desc>}
+      <NameWrapper>
+        
+        <Name>{item.name}{<Badge>{item.badge}</Badge>}</Name>
+        {item.description && <Desc>{item.description}</Desc>}
+      </NameWrapper>
 
       <PriceRow>
         <Price>{item.price.toLocaleString()} 원</Price>
@@ -42,13 +44,12 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
 
       <Bottom>
         <AddButton onClick={add} disabled={!item.isAvailable}>
-          {item.isAvailable ? '장바구니 담기' : '품절'}
+          {item.isAvailable ? "장바구니 담기" : "품절"}
         </AddButton>
       </Bottom>
     </Modal>
   );
 }
-
 
 /* ==== styled ==== */
 const Header = styled.div`
@@ -90,11 +91,12 @@ const Hero = styled.img`
 `;
 
 const NameWrapper = styled.div`
-  margin-top: 32px; /* 위쪽 간격 */
+  margin-top: 22px; /* 위쪽 간격 */
 `;
 
 const Badge = styled.span`
   display: inline-block;
+  margin-left: 20px;
   margin-top: 16px;
   color: #e25822;
   font-weight: 700;
@@ -104,12 +106,12 @@ const Badge = styled.span`
 const Name = styled.h3`
   margin: 4px 0 8px 0;
   font-size: 20px;
-  font-weight: 900;
+  font-weight: 700;
   color: #2b211b;
 `;
 
 const Desc = styled.p`
-  margin: 0;
+  margin-top: 10px;
   white-space: pre-line; /* 줄바꿈 유지 */
   color: #7a5f54;
   font-size: 16px;
