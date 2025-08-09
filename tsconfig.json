@@ -9,7 +9,8 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
+    "module": "ESNext",
+    "verbatimModuleSyntax": true,
     "target": "esnext",
     "types": [],
     // For nodejs:
