@@ -1,54 +1,65 @@
-
 export const MOCK_FOOD = {
   foods: [
     {
       id: 1,
       category: 'FOOD',
       badge: 'Best!',
-      title: '오징어 튀김',
+      name: '오징어 튀김',
       description:
         '부드러운 오징어 튀김\n얇고 바삭한 튀김옷을 입은\n부드러운 오징어링!\n*잘 어울리는 소스와 함께 제공됩니다 :)',
       price: 6900,
-      image: 'https://images.unsplash.com/photo-1617195737492-3bdb3a9f49d0?q=80&w=800&auto=format&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1617195737492-3bdb3a9f49d0?q=80&w=800&auto=format&fit=crop',
+      isAvailable: true,
     },
     {
       id: 2,
       category: 'FOOD',
-      title: '떡볶이',
+      name: '떡볶이',
       description: '달콤하고 적당히 매콤한\n국민 분식 떡볶이!',
       price: 6900,
-      image: 'https://images.unsplash.com/photo-1604908554007-ef8a9f1a5c93?q=80&w=800&auto=format&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1604908554007-ef8a9f1a5c93?q=80&w=800&auto=format&fit=crop',
+      isAvailable: true,
     },
     {
       id: 3,
-      type: 'FOOD',
-      title: '김치볶음밥',
+      category: 'FOOD',
+      name: '김치볶음밥',
       description:
         '스팸과 김치가 듬뿍 들어간 김치볶음밥\n*볶음밥 위에 계란후라이가 올라갑니다.',
       price: 7900,
-      image: 'https://images.unsplash.com/photo-1617195737396-0c7b3f8e9b7a?q=80&w=800&auto=format&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1617195737396-0c7b3f8e9b7a?q=80&w=800&auto=format&fit=crop',
+      isAvailable: true,
     },
     {
       id: 4,
-      type: 'FOOD',
-      title: '오뎅탕',
+      category: 'FOOD',
+      name: '오뎅탕',
       description: '뜨끈한 국물이 일품인 오뎅탕\n*부산어묵 5개',
       price: 10900,
-      image: 'https://images.unsplash.com/photo-1546549039-49c49e0b6b7f?q=80&w=800&auto=format&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1546549039-49c49e0b6b7f?q=80&w=800&auto=format&fit=crop',
+      isAvailable: true,
     },
     {
       id: 5,
       category: 'DRINK',
-      title: '사이다',
+      name: '사이다',
       price: 2900,
-      image: 'https://images.unsplash.com/photo-1572208590534-8b5b8b8b6b6a?q=80&w=800&auto=format&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1572208590534-8b5b8b8b6b6a?q=80&w=800&auto=format&fit=crop',
+      isAvailable: true,
     },
     {
       id: 6,
-      type: 'DRINK',
-      title: '콜라',
+      category: 'DRINK',
+      name: '콜라',
       price: 2900,
-      image: 'https://images.unsplash.com/photo-1587017539504-67cf0f4c9d79?q=80&w=800&auto=format&fit=crop',
+      imageUrl:
+        'https://images.unsplash.com/photo-1587017539504-67cf0f4c9d79?q=80&w=800&auto=format&fit=crop',
+      isAvailable: true,
     },
   ],
 };

@@ -5,14 +5,14 @@ import Header from '../components/common/Header.jsx';
 import FoodCard from '../components/menu/FoodCard.jsx';
 import FoodDetailModal from '../components/menu/FoodDetailModal.jsx';
 import { paths } from '../routes/paths.js';
-import { MOCK_FOOD } from '../test/mock.js';
+import { MOCK_FOOD } from '../test/mock.js'; // 이 MOCK도 새 스키마로 맞춰놨다고 가정
 
 const MOCK = MOCK_FOOD;
 
 export default function MenuPage() {
   const { boothId } = useParams();
   const navigate = useNavigate();
-  const [selected, setSelected] = useState(null); // 모달용 선택 아이템
+  const [selected, setSelected] = useState(null);
 
   const { foodList, drinkList } = useMemo(() => {
     const foodList = MOCK.foods.filter((f) => f.category === 'FOOD');
@@ -24,8 +24,8 @@ export default function MenuPage() {
   const closeDetail = useCallback(() => setSelected(null), []);
 
   const handleAdd = useCallback((item, qty) => {
-    // TODO: 추후 Redux cartSlice.add({ item, qty })로 교체
-    console.log('장바구니 담기:', item.title, 'x', qty);
+    // TODO: Redux cartSlice.add({ id:item.id, name:item.name, price:item.price, imageUrl:item.imageUrl, qty })
+    console.log('장바구니 담기:', item.name, 'x', qty);
     closeDetail();
   }, [closeDetail]);
 
@@ -43,11 +43,11 @@ export default function MenuPage() {
           {foodList.map((item) => (
             <FoodCard
               key={item.id}
-              badge={item.badge}
-              title={item.title}
+              name={item.name}
               description={item.description}
               price={item.price}
-              image={item.image}
+              imageUrl={item.imageUrl}
+              isAvailable={item.isAvailable}
               onClick={() => openDetail(item)}
             />
           ))}
@@ -60,9 +60,11 @@ export default function MenuPage() {
           {drinkList.map((item) => (
             <FoodCard
               key={item.id}
-              title={item.title}
+              name={item.name}
+              description={item.description}
               price={item.price}
-              image={item.image}
+              imageUrl={item.imageUrl}
+              isAvailable={item.isAvailable}
               onClick={() => openDetail(item)}
             />
           ))}
@@ -74,7 +76,6 @@ export default function MenuPage() {
         <OrderButton onClick={() => navigate(paths.cart(boothId))}>주문하기</OrderButton>
       </BottomBar>
 
-      {/* 상세 모달 */}
       <FoodDetailModal
         open={!!selected}
         item={selected}
@@ -93,7 +94,7 @@ const Page = styled.div`
 `;
 
 const Section = styled.section`
-  padding: 16px 16px 0 16px;
+  padding: 10px 5px;
 `;
 
 const SectionTitle = styled.h2`
@@ -105,7 +106,7 @@ const SectionTitle = styled.h2`
 const CardList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
 `;
 
 const BottomSpacer = styled.div`

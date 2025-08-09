@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import Modal from "../common/Modal.jsx";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import Modal from '../common/Modal.jsx';
 
 export default function FoodDetailModal({ open, item, onClose, onAdd }) {
-  const [quantity, setQuantity] = useState(1);
-  if (!item || !item.isAvailable ) return null; // 없거나, 품절이면 끄기
+  const [qty, setQty] = useState(1);
+  if (!item) return null;
 
-  const inc = () => setQuantity((n) => n + 1);
-  const dec = () => setQuantity((n) => Math.max(1, n - 1));
-  const add = () => onAdd?.(item, quantity);
+  const inc = () => setQty((n) => n + 1);
+  const dec = () => setQty((n) => Math.max(1, n - 1));
+  const add = () => onAdd?.(item, qty);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -17,32 +17,29 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
         <CloseBtn onClick={onClose}>✕</CloseBtn>
       </Header>
 
-      {item.image && <Hero src={item.image} alt={item.title} />}
+      {item.imageUrl && <Hero src={item.imageUrl} alt={item.name} />}
 
       {item.badge && <Badge>{item.badge}</Badge>}
-
-      <NameWrapper>
-        <Name>{item.title}</Name>
-        {item.description && <Desc>{item.description}</Desc>}
-      </NameWrapper>
+      <Name>{item.name}</Name>
+      {item.description && <Desc>{item.description}</Desc>}
 
       <PriceRow>
         <Price>{item.price.toLocaleString()} 원</Price>
-
         <QtyBox>
           <QtyBtn onClick={dec}>−</QtyBtn>
-          <QtyValue>{quantity}</QtyValue>
+          <QtyValue>{qty}</QtyValue>
           <QtyBtn onClick={inc}>＋</QtyBtn>
         </QtyBox>
       </PriceRow>
 
       <Bottom>
-        <AddButton onClick={add}>장바구니 담기</AddButton>
+        <AddButton onClick={add} disabled={!item.isAvailable}>
+          {item.isAvailable ? '장바구니 담기' : '품절'}
+        </AddButton>
       </Bottom>
     </Modal>
   );
 }
-
 /* ==== styled ==== */
 const Header = styled.div`
   grid-template-columns: 1fr auto;
