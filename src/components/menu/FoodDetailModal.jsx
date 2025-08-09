@@ -16,7 +16,7 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
 
   const inc = () => setQty((n) => n + 1);
   const dec = () => setQty((n) => Math.max(1, n - 1));
-  const add = () => onAdd?.(item, qty);
+  const add = () => onAdd?.(item, qty); // 장바구니 추가
 
   return (
     <Modal open={open} onClose={onClose}>
