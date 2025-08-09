@@ -63,3 +63,9 @@ export const MOCK_FOOD = {
     },
   ],
 };
+
+export const MOCK_ACCOUNT = {
+  bank: '카카오뱅크',
+  account: '123-****-****',
+  accountHolder: '정석찬',
+};

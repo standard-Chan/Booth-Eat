@@ -10,7 +10,6 @@ import NotFound from '../components/NotFound.jsx';
 export default function AppRouter() {
   return (
     <>
-    <div>HI</div>
     <Routes>
       {/* 루트 접근 시(예: /) 데모용으로 부스 1로 리다이렉트. 실제로는 부스 선택 페이지 연결 권장 */}
       <Route path="/" element={<Navigate to="/booths/1/menu" replace />} />

@@ -17,10 +17,6 @@ export default function BoothLayout() {
   return (
     <div style={{ maxWidth: 560, margin: '0 auto', padding: '16px' }}>
       {/* 데모용 상단 네비게이션 */}
-      <nav style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-        <Link to={paths.menu(boothId)}>메뉴</Link>
-        <Link to={paths.cart(boothId)}>장바구니</Link>
-      </nav>
       <Outlet />
     </div>
   );
