@@ -111,17 +111,18 @@ const TotalRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 12px;
+  margin: 0px 25px;
+  margin-bottom: 25px;
 `;
 
 const TotalLabel = styled.div`
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
 `;
 
 const TotalValue = styled.div`
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 25px;
+  font-weight: 700;
 `;
 
 const PrimaryBtn = styled.button`
