@@ -83,8 +83,8 @@ const Desc = styled.p`
 
 const PricePill = styled.span`
   position: absolute;
-  left: 8px;   /* 좌측 여백 */
-  bottom: 8px; /* 하단 여백 */
+  left: 0px;   /* 좌측 여백 */
+  bottom: 15px; /* 하단 여백 */
   background: #f1eee9;
   padding: 8px 14px;
   border-radius: 999px;

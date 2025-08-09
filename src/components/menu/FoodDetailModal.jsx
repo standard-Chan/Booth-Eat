@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from '../common/Modal.jsx';
 
 export default function FoodDetailModal({ open, item, onClose, onAdd }) {
   const [qty, setQty] = useState(1);
+
+  // 모달 열릴 때마다 수량 초기화
+  useEffect(() => {
+    if (open) {
+      setQty(1);
+    }
+  }, [open, item]);
+
   if (!item) return null;
 
   const inc = () => setQty((n) => n + 1);
@@ -40,6 +48,8 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
     </Modal>
   );
 }
+
+
 /* ==== styled ==== */
 const Header = styled.div`
   grid-template-columns: 1fr auto;
