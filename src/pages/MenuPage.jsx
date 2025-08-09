@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header.jsx';
 import FoodCard from '../components/menu/FoodCard.jsx';
+import FoodDetailModal from '../components/menu/FoodDetailModal.jsx';
 import { paths } from '../routes/paths.js';
 import { MOCK_FOOD } from '../test/mock.js';
 
@@ -11,12 +12,22 @@ const MOCK = MOCK_FOOD;
 export default function MenuPage() {
   const { boothId } = useParams();
   const navigate = useNavigate();
+  const [selected, setSelected] = useState(null); // 모달용 선택 아이템
 
   const { foodList, drinkList } = useMemo(() => {
-    const foodList = MOCK.foods.filter((f) => f.type === 'FOOD');
-    const drinkList = MOCK.foods.filter((f) => f.type === 'DRINK');
+    const foodList = MOCK.foods.filter((f) => f.category === 'FOOD');
+    const drinkList = MOCK.foods.filter((f) => f.category === 'DRINK');
     return { foodList, drinkList };
   }, []);
+
+  const openDetail = useCallback((item) => setSelected(item), []);
+  const closeDetail = useCallback(() => setSelected(null), []);
+
+  const handleAdd = useCallback((item, qty) => {
+    // TODO: 추후 Redux cartSlice.add({ item, qty })로 교체
+    console.log('장바구니 담기:', item.title, 'x', qty);
+    closeDetail();
+  }, [closeDetail]);
 
   return (
     <Page>
@@ -37,7 +48,7 @@ export default function MenuPage() {
               description={item.description}
               price={item.price}
               image={item.image}
-              onClick={() => {/* 팝업 오픈 예정 */}}
+              onClick={() => openDetail(item)}
             />
           ))}
         </CardList>
@@ -52,7 +63,7 @@ export default function MenuPage() {
               title={item.title}
               price={item.price}
               image={item.image}
-              onClick={() => {}}
+              onClick={() => openDetail(item)}
             />
           ))}
         </CardList>
@@ -62,6 +73,14 @@ export default function MenuPage() {
       <BottomBar>
         <OrderButton onClick={() => navigate(paths.cart(boothId))}>주문하기</OrderButton>
       </BottomBar>
+
+      {/* 상세 모달 */}
+      <FoodDetailModal
+        open={!!selected}
+        item={selected}
+        onClose={closeDetail}
+        onAdd={handleAdd}
+      />
     </Page>
   );
 }
@@ -70,7 +89,7 @@ export default function MenuPage() {
 const Page = styled.div`
   max-width: 560px;
   margin: 0 auto;
-  padding-bottom: 92px; /* 하단 버튼 공간 확보 */
+  padding-bottom: 92px;
 `;
 
 const Section = styled.section`
@@ -100,12 +119,13 @@ const BottomBar = styled.div`
   transform: translateX(-50%);
   width: min(520px, 92vw);
   padding: 0 8px;
+  z-index: 20;
 `;
 
 const OrderButton = styled.button`
   width: 100%;
   height: 56px;
-  background: #ef6a3b; /* 주황 */
+  background: #ef6a3b;
   color: #fff;
   border: 0;
   border-radius: 16px;

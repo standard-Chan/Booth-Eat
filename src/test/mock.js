@@ -3,7 +3,7 @@ export const MOCK_FOOD = {
   foods: [
     {
       id: 1,
-      type: 'FOOD',
+      category: 'FOOD',
       badge: 'Best!',
       title: '오징어 튀김',
       description:
@@ -13,7 +13,7 @@ export const MOCK_FOOD = {
     },
     {
       id: 2,
-      type: 'FOOD',
+      category: 'FOOD',
       title: '떡볶이',
       description: '달콤하고 적당히 매콤한\n국민 분식 떡볶이!',
       price: 6900,
@@ -38,7 +38,7 @@ export const MOCK_FOOD = {
     },
     {
       id: 5,
-      type: 'DRINK',
+      category: 'DRINK',
       title: '사이다',
       price: 2900,
       image: 'https://images.unsplash.com/photo-1572208590534-8b5b8b8b6b6a?q=80&w=800&auto=format&fit=crop',
