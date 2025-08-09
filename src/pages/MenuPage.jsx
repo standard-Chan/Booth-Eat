@@ -6,12 +6,16 @@ import FoodCard from '../components/menu/FoodCard.jsx';
 import FoodDetailModal from '../components/menu/FoodDetailModal.jsx';
 import { paths } from '../routes/paths.js';
 import { MOCK_FOOD } from '../test/mock.js'; // 이 MOCK도 새 스키마로 맞춰놨다고 가정
+import { addItem } from '../store/cartSlice.js';
+import { useDispatch } from 'react-redux';
 
 const MOCK = MOCK_FOOD;
 
 export default function MenuPage() {
   const { boothId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
   const [selected, setSelected] = useState(null);
 
   const { foodList, drinkList } = useMemo(() => {
@@ -22,12 +26,23 @@ export default function MenuPage() {
 
   const openDetail = useCallback((item) => setSelected(item), []);
   const closeDetail = useCallback(() => setSelected(null), []);
+  
 
-  const handleAdd = useCallback((item, qty) => {
-    // TODO: Redux cartSlice.add({ id:item.id, name:item.name, price:item.price, imageUrl:item.imageUrl, qty })
-    console.log('장바구니 담기:', item.name, 'x', qty);
-    closeDetail();
-  }, [closeDetail]);
+  // 장바구니에 menu item 담기
+  const handleAdd = useCallback(
+    (item, qty) => {
+      // 요구 스키마로 변환하여 저장
+      dispatch(addItem({
+        foodId: item.id,
+        name: item.name,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        quantity: qty,
+      }));
+      closeDetail();
+    },
+    [dispatch, closeDetail]
+  );
 
   return (
     <Page>
