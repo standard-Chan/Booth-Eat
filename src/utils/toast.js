@@ -4,7 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 // 공통 토스트 함수
 export const showSuccessToast = (message) => {
   toast.success(message, {
-    position: 'top-center',
     autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -15,7 +14,6 @@ export const showSuccessToast = (message) => {
 
 export const showErrorToast = (message) => {
   toast.error(message, {
-    position: 'top-center',
     autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,

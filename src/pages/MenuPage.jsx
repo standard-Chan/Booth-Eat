@@ -8,6 +8,7 @@ import { paths } from '../routes/paths.js';
 import { MOCK_FOOD } from '../test/mock.js'; 
 import { addItem } from '../store/cartSlice.js';
 import { useDispatch } from 'react-redux';
+import { showSuccessToast } from '../utils/toast.js';
 
 const MOCK = MOCK_FOOD;
 
@@ -39,6 +40,9 @@ export default function MenuPage() {
         imageUrl: item.imageUrl,
         quantity: qty,
       }));
+
+      showSuccessToast('장바구니에 담기에 성공하였습니다.');
+
       closeDetail();
     },
     [dispatch, closeDetail]
