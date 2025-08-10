@@ -12,6 +12,7 @@ import {
 import Header from "../components/common/Header.jsx";
 import CartItem from "../components/cart/CartItem.jsx";
 import { paths } from "../routes/paths.js";
+import { showErrorToast } from "../utils/toast.js";
 
 export default function CartPage() {
   const { boothId } = useParams();
@@ -21,7 +22,10 @@ export default function CartPage() {
   const totalAmount = useSelector(selectCartTotalAmount);
 
   const goConfirm = () => {
-    if (!items.length) return alert("장바구니가 비어있습니다.");
+    if (!items.length) {
+      showErrorToast("장바구니가 비어있습니다.");
+      return;
+    }
     navigate(paths.confirm(boothId));
   };
 
