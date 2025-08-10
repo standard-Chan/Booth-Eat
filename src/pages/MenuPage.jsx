@@ -5,7 +5,7 @@ import Header from '../components/common/Header.jsx';
 import FoodCard from '../components/menu/FoodCard.jsx';
 import FoodDetailModal from '../components/menu/FoodDetailModal.jsx';
 import { paths } from '../routes/paths.js';
-import { MOCK_FOOD } from '../test/mock.js'; // 이 MOCK도 새 스키마로 맞춰놨다고 가정
+import { MOCK_FOOD } from '../test/mock.js'; 
 import { addItem } from '../store/cartSlice.js';
 import { useDispatch } from 'react-redux';
 

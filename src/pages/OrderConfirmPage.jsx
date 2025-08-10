@@ -1,4 +1,3 @@
-// pages/OrderConfirmPage.jsx (핵심만 발췌 — 컴포넌트 이름/로직은 이전 버전 그대로)
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
@@ -21,6 +20,9 @@ export default function OrderConfirmPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(true);
+
+
+  // account API로 가져오는 로직 
 
   const submit = () => {
     if (!name.trim()) return alert("성함을 입력해주세요.");
