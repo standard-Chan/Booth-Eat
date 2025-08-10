@@ -69,3 +69,37 @@ export const MOCK_ACCOUNT = {
   account: '123-****-****',
   accountHolder: '정석찬',
 };
+
+
+export const MOCK_ORDERS = [
+  {
+    orderId: 75941,
+    boothName : "벤처주점오세요",
+    status: 'PENDING',        // PENDING | APPROVED | REJECTED
+    tableNo: 7,
+    items: [
+      { foodId: 11, name: '오징어튀김', price: 7000, imageUrl: '', quantity: 2 },
+      { foodId: 12, name: '떡볶이', price: 6900, imageUrl: '', quantity: 1 },
+      { foodId: 13, name: '김치볶음밥', price: 7900, imageUrl: '', quantity: 1 },
+      { foodId: 14, name: '콜라', price: 2900, imageUrl: '', quantity: 1 },
+    ],
+    amount: 17700,
+    createdAt: '2025-08-13T17:45:00Z',
+  },
+  {
+    orderId: 75942,
+    status: 'REJECTED',
+    tableNo: 7,
+    items: [{}, {}, {}],
+    amount: 21800,
+    createdAt: '2025-08-13T17:25:00Z',
+  },
+  {
+    orderId: 75943,
+    status: 'APPROVED',
+    tableNo: 7,
+    items: [{}, {}, {}, {}],
+    amount: 21800,
+    createdAt: '2025-08-13T17:15:00Z',
+  },
+];
