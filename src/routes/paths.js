@@ -4,4 +4,5 @@ export const paths = {
   confirm: (boothId) => `/booths/${boothId}/order/confirm`,
   pending: (boothId, orderId) => `/booths/${boothId}/order/pending/${orderId}`,
   complete: (boothId, orderId) => `/booths/${boothId}/order/complete/${orderId}`,
+  orderHistory: (boothId) => `/booths/${boothId}/orderHistory`,
 };
