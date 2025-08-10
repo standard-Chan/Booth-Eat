@@ -48,7 +48,7 @@ export default function MenuPage() {
     <Page>
       <Header
         title="Menu"
-        onLeft={() => {}}
+        onLeft={() => navigate(paths.orderHistory(boothId))}
         onRight={() => navigate(paths.cart(boothId))}
       />
 

@@ -1,11 +1,17 @@
-import React from 'react';
-import styled from 'styled-components';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { inc, dec, removeItem, selectCartItems, selectCartTotalAmount } from '../store/cartSlice.js';
-import Header from '../components/common/Header.jsx';
-import CartItem from '../components/cart/CartItem.jsx';
-import { paths } from '../routes/paths.js';
+import React from "react";
+import styled from "styled-components";
+import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  inc,
+  dec,
+  removeItem,
+  selectCartItems,
+  selectCartTotalAmount,
+} from "../store/cartSlice.js";
+import Header from "../components/common/Header.jsx";
+import CartItem from "../components/cart/CartItem.jsx";
+import { paths } from "../routes/paths.js";
 
 export default function CartPage() {
   const { boothId } = useParams();
@@ -15,13 +21,17 @@ export default function CartPage() {
   const totalAmount = useSelector(selectCartTotalAmount);
 
   const goConfirm = () => {
-    if (!items.length) return alert('장바구니가 비어있습니다.');
+    if (!items.length) return alert("장바구니가 비어있습니다.");
     navigate(paths.confirm(boothId));
   };
 
   return (
     <Page>
-      <Header title="장바구니" onLeft={() => navigate(-1)} onRight={() => {}} />
+      <Header
+        title="장바구니"
+        onLeft={() => navigate(paths.orderHistory(boothId))}
+        onRight={() => {}}
+      />
 
       <List>
         {items.length === 0 ? (
@@ -104,7 +114,7 @@ const BottomArea = styled.div`
   width: min(560px, 100vw);
   background: #fff;
   padding: 16px;
-  box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
 `;
 
 const TotalRow = styled.div`

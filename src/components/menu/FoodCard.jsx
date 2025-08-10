@@ -92,18 +92,20 @@ const PricePill = styled.span`
 `;
 const ThumbWrap = styled.div`
   position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 600:400 비율 유지 */
 `;
 
 const Thumb = styled.img`
-  width: 110px;
-  height: 110px;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
   border-radius: 16px;
 `;
 
 const SoldOut = styled.div`
   position: absolute;
-  inset: 0;
+  inset: 0; /* 부모 크기에 딱 맞춤 */
   background: rgba(0,0,0,0.45);
   color: #fff;
   font-weight: 800;

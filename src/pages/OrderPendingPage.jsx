@@ -2,21 +2,27 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { clear } from '../store/cartSlice.js';
 import Header from '../components/common/Header.jsx';
 import { paths } from '../routes/paths.js';
 
 export default function OrderPendingPage() {
   const { boothId, orderId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    // 페이지 진입 시 장바구니 비우기
+    dispatch(clear());
+
     // 데모: 2초 후 완료 페이지로 이동
-    // 실제에선 SSE/WS 이벤트 수신하거나 폴링으로 상태가 APPROVED일 때 navigate
     const t = setTimeout(() => {
       navigate(paths.complete(boothId, orderId));
     }, 2000);
-    return () => clearTimeout(t); // 누수 방지
-  }, [boothId, orderId, navigate]);
+
+    return () => clearTimeout(t);
+  }, [boothId, orderId, navigate, dispatch]);
 
   const goHome = () => navigate(paths.menu(boothId));
 
@@ -24,9 +30,9 @@ export default function OrderPendingPage() {
     <Page>
       <Header
         title="결제 확인"
-        leftIcon={<span style={{ fontSize: 22 }}>×</span>}  // X 버튼
-        onLeft={goHome}                                      // 처음 메뉴로
-        rightIcon={<span />}                                 // 오른쪽 빈 자리
+        leftIcon={<span style={{ fontSize: 22 }}>×</span>}
+        onLeft={goHome}
+        rightIcon={<span />}
       />
 
       <Content>
@@ -46,7 +52,7 @@ export default function OrderPendingPage() {
 const Page = styled.div`
   max-width: 560px;
   margin: 0 auto;
-  padding-bottom: 120px; /* 하단 버튼 공간 확보 */
+  padding-bottom: 120px;
 `;
 
 const Content = styled.div`
