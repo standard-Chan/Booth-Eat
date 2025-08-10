@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import Header from "../components/common/Header.jsx";
 import { selectCartTotalAmount } from "../store/cartSlice.js";
 import { paths } from "../routes/paths.js";
+import { showErrorToast, showSuccessToast } from "../utils/toast.js";
 
 const MOCK_ACCOUNT = {
   bank: "카카오뱅크",
@@ -25,10 +26,11 @@ export default function OrderConfirmPage() {
   // account API로 가져오는 로직 
 
   const submit = () => {
-    if (!name.trim()) return alert("성함을 입력해주세요.");
-    if (!phone.trim()) return alert("전화번호를 입력해주세요.");
-    if (!agree) return alert("개인정보 수집·이용에 동의해주세요.");
+    if (!name.trim()) return showErrorToast("성함을 입력해주세요.");
+    if (!phone.trim()) return showErrorToast("전화번호를 입력해주세요.");
+    if (!agree) return showErrorToast("개인정보 수집·이용에 동의해주세요.");
     const dummyOrderId = "ODR12345";
+    showSuccessToast(`${name}님의 주문요청이 관리자에게 전달되었습니다.`)
     navigate(paths.pending(boothId, dummyOrderId));
   };
 

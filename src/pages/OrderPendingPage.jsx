@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { clear } from '../store/cartSlice.js';
 import Header from '../components/common/Header.jsx';
 import { paths } from '../routes/paths.js';
+import { showSuccessToast } from '../utils/toast.js';
 
 export default function OrderPendingPage() {
   const { boothId, orderId } = useParams();
@@ -18,8 +19,9 @@ export default function OrderPendingPage() {
 
     // 데모: 2초 후 완료 페이지로 이동
     const t = setTimeout(() => {
+      showSuccessToast("결제 확인이 완료되었습니다.");
       navigate(paths.complete(boothId, orderId));
-    }, 2000);
+    }, 4000);
 
     return () => clearTimeout(t);
   }, [boothId, orderId, navigate, dispatch]);
