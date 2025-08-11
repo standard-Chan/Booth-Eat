@@ -1,0 +1,20 @@
+{
+  "/api/booths/:boothId/menuItems": "/menuItems?boothId=:boothId",
+  "/api/booths/:boothId/menuItems/:menuItemId": "/menuItems/:menuItemId",
+  "/api/booths/:boothId/account": "/accounts?boothId=:boothId",
+
+  "/api/menus": "/menuItems",
+  "/api/menus/:menuId": "/menuItems/:menuId",
+  "/api/menus/:menuId/total-orders": "/menuTotals?menuItemId=:menuId",
+  "/api/menus/:menuId/available": "/menuItems/:menuId",
+
+  "/api/orders": "/orders",
+  "/api/orders/:orderId": "/orders/:orderId",
+  "/api/orders/:orderId/detail": "/orderDetails?orderId=:orderId",
+
+  "/api/tables": "/tables",
+  "/api/tables/:tableId/latest-orders": "/latestOrders?tableId=:tableId",
+
+  "/api/sales": "/salesDaily",
+  "/api/sales/menu": "/menuSales"
+}

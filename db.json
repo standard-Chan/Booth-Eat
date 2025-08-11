@@ -1,0 +1,363 @@
+{
+  "booths": [
+    {
+      "id": 1,
+      "name": "1번 부스"
+    },
+    {
+      "id": 2,
+      "name": "2번 부스"
+    }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "bank": "카카오뱅크",
+      "account": "123-****-****",
+      "accountHolder": "정석찬"
+    },
+    {
+      "id": 2,
+      "boothId": 2,
+      "bank": "토스뱅크",
+      "account": "456-****-****",
+      "accountHolder": "모드니"
+    }
+  ],
+  "menuItems": [
+    {
+      "id": 1,
+      "menuItemId": 1,
+      "boothId": 1,
+      "name": "치즈버거",
+      "description": "고소한 치즈와 두툼한 패티",
+      "price": 5000,
+      "category": "FOOD",
+      "previewImage": "/images/sample1.jpg",
+      "available": true,
+      "isAvailable": true
+    },
+    {
+      "id": 2,
+      "menuItemId": 2,
+      "boothId": 1,
+      "name": "오징어 튀김",
+      "description": "오징어",
+      "price": 7000,
+      "category": "FOOD",
+      "previewImage": "/images/sample2.jpg",
+      "available": true,
+      "isAvailable": true
+    },
+    {
+      "id": 3,
+      "menuItemId": 3,
+      "boothId": 1,
+      "name": "김치볶음밥",
+      "description": "불맛 살짝",
+      "price": 6000,
+      "category": "FOOD",
+      "previewImage": "/images/sample3.jpg",
+      "available": true,
+      "isAvailable": true
+    },
+    {
+      "id": 4,
+      "menuItemId": 4,
+      "boothId": 1,
+      "name": "오뎅탕",
+      "description": "국물 진함",
+      "price": 4000,
+      "category": "FOOD",
+      "previewImage": "/images/sample4.jpg",
+      "available": false,
+      "isAvailable": false
+    },
+    {
+      "boothId": "1",
+      "name": "@@@@@@@@@@@@@버거",
+      "price": 10000000,
+      "description": "골뱅이무침버거",
+      "category": "FOOD",
+      "previewImage": "/images/sample1.jpg",
+      "available": false,
+      "id": 5
+    }
+  ],
+  "menuTotals": [
+    {
+      "id": 1,
+      "menuItemId": 1,
+      "totalOrderQuantity": 21
+    },
+    {
+      "id": 2,
+      "menuItemId": 2,
+      "totalOrderQuantity": 26
+    },
+    {
+      "id": 3,
+      "menuItemId": 3,
+      "totalOrderQuantity": 21
+    },
+    {
+      "id": 4,
+      "menuItemId": 4,
+      "totalOrderQuantity": 15
+    }
+  ],
+  "orders": [
+    {
+      "id": 123,
+      "boothId": 1,
+      "tableNo": 7,
+      "status": "PENDING",
+      "amount": 43000,
+      "createdAt": "2025-08-09T11:30:00Z",
+      "items": [
+        {
+          "foodId": 2,
+          "name": "오징어튀김",
+          "price": 7000,
+          "imageUrl": "/images/sample2.jpg",
+          "quantity": 2
+        },
+        {
+          "foodId": 1,
+          "name": "치즈버거",
+          "price": 5000,
+          "imageUrl": "/images/sample1.jpg",
+          "quantity": 3
+        }
+      ],
+      "payment": {
+        "payerName": "정석찬",
+        "amount": 43000
+      }
+    },
+    {
+      "id": 124,
+      "boothId": 1,
+      "tableNo": 7,
+      "status": "APPROVED",
+      "amount": 15000,
+      "createdAt": "2025-08-09T11:40:00Z",
+      "items": [
+        {
+          "foodId": 1,
+          "name": "치즈버거",
+          "price": 5000,
+          "imageUrl": "/images/sample1.jpg",
+          "quantity": 3
+        }
+      ],
+      "payment": {
+        "payerName": "홍길동",
+        "amount": 15000
+      }
+    }
+  ],
+  "tables": [
+    {
+      "id": 1,
+      "tableId": 1,
+      "boothId": 1,
+      "tableNumber": 1,
+      "active": true
+    },
+    {
+      "id": 2,
+      "tableId": 2,
+      "boothId": 1,
+      "tableNumber": 2,
+      "active": true
+    },
+    {
+      "id": 3,
+      "tableId": 3,
+      "boothId": 1,
+      "tableNumber": 3,
+      "active": false
+    },
+    {
+      "id": 4,
+      "tableId": 4,
+      "boothId": 1,
+      "tableNumber": 7,
+      "active": true
+    }
+  ],
+  "latestOrders": [
+    {
+      "id": 1,
+      "tableId": 4,
+      "orderIds": [
+        123,
+        124
+      ]
+    },
+    {
+      "id": 2,
+      "tableId": 2,
+      "orderIds": []
+    }
+  ],
+  "orderDetails": [
+    {
+      "id": 123,
+      "orderId": 123,
+      "customerOrder": {
+        "order_id": 123,
+        "table_id": 4,
+        "visit_id": 999,
+        "status": "PENDING",
+        "order_code": "ORD-123",
+        "total_amount": 43000,
+        "created_at": "2025-08-09T11:30:00Z",
+        "approved_at": null
+      },
+      "orderItems": [
+        {
+          "name": "오징어튀김",
+          "quantity": 2
+        },
+        {
+          "name": "치즈버거",
+          "quantity": 3
+        }
+      ],
+      "paymentInfo": {
+        "payer_name": "정석찬",
+        "amount": 43000
+      }
+    },
+    {
+      "id": 124,
+      "orderId": 124,
+      "customerOrder": {
+        "order_id": 124,
+        "table_id": 4,
+        "visit_id": 999,
+        "status": "APPROVED",
+        "order_code": "ORD-124",
+        "total_amount": 15000,
+        "created_at": "2025-08-09T11:40:00Z",
+        "approved_at": "2025-08-09T11:42:00Z"
+      },
+      "orderItems": [
+        {
+          "name": "치즈버거",
+          "quantity": 3
+        }
+      ],
+      "paymentInfo": {
+        "payer_name": "홍길동",
+        "amount": 15000
+      }
+    }
+  ],
+  "ordersByTable": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "tableId": 4,
+      "orders": [
+        {
+          "customerOrder": {
+            "order_id": 123,
+            "table_id": 4,
+            "visit_id": 999,
+            "status": "PENDING",
+            "order_code": "ORD-123",
+            "total_amount": 43000,
+            "created_at": "2025-08-09T11:30:00Z",
+            "approved_at": null
+          },
+          "orderItems": [
+            {
+              "name": "오징어튀김",
+              "quantity": 2
+            },
+            {
+              "name": "치즈버거",
+              "quantity": 3
+            }
+          ],
+          "paymentInfo": {
+            "payer_name": "정석찬",
+            "amount": 43000
+          }
+        },
+        {
+          "customerOrder": {
+            "order_id": 124,
+            "table_id": 4,
+            "visit_id": 999,
+            "status": "APPROVED",
+            "order_code": "ORD-124",
+            "total_amount": 15000,
+            "created_at": "2025-08-09T11:40:00Z",
+            "approved_at": "2025-08-09T11:42:00Z"
+          },
+          "orderItems": [
+            {
+              "name": "치즈버거",
+              "quantity": 3
+            }
+          ],
+          "paymentInfo": {
+            "payer_name": "홍길동",
+            "amount": 15000
+          }
+        }
+      ]
+    }
+  ],
+  "salesDaily": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "date": "2025-08-09",
+      "totalSales": 720000,
+      "orderNumbers": 44
+    },
+    {
+      "id": 2,
+      "boothId": 1,
+      "date": "2025-08-10",
+      "totalSales": 380000,
+      "orderNumbers": 20
+    }
+  ],
+  "menuSales": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "menuItemId": 1,
+      "name": "치즈버거",
+      "totalSales": 150000
+    },
+    {
+      "id": 2,
+      "boothId": 1,
+      "menuItemId": 2,
+      "name": "오징어 튀김",
+      "totalSales": 210000
+    },
+    {
+      "id": 3,
+      "boothId": 1,
+      "menuItemId": 3,
+      "name": "김치볶음밥",
+      "totalSales": 180000
+    },
+    {
+      "id": 4,
+      "boothId": 1,
+      "menuItemId": 4,
+      "name": "오뎅탕",
+      "totalSales": 120000
+    }
+  ]
+}

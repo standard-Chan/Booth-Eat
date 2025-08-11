@@ -8,33 +8,6 @@ import { fetchMenus, createMenu, updateMenu, deleteMenu } from '../../api/manage
 import MenuCard from '../../components/common/manager/menu/MenuCard.jsx';
 import MenuEditorRow from '../../components/common/manager/menu/MenuEditorRow.jsx';
 
-
-
-
-const HeaderLine = styled.div`
-  display:flex; justify-content:flex-end; margin-bottom:14px;
-`;
-
-const AddBtn = styled.button`
-  display:flex; align-items:center; gap:8px;
-  background:#ff6a2b; color:#fff; border:0; border-radius:10px;
-  padding:10px 14px; cursor:pointer; font-weight:600;
-  &:hover{ filter:brightness(0.98); }
-`;
-
-const Stack = styled.div`
-  display:flex; flex-direction:column; gap:12px;
-`;
-
-const SectionTitle = styled.div`
-  margin: 14px 0 6px; color:#6b7280; font-size:14px; display:flex; align-items:center; gap:8px;
-  &::before{
-    content:'';
-    display:inline-block; width:8px; height:8px; border-radius:50%;
-    background:${({on}) => (on ? '#ff6a2b' : '#9aa0a6')};
-  }
-`;
-
 export default function MenuManagePage() {
   const { boothId } = useParams(); // 라우터에서 추출 (ex: /manager/:boothId/menus)
   const [items, setItems] = useState([]);
@@ -205,3 +178,29 @@ export default function MenuManagePage() {
     </AppLayout>
   );
 }
+
+
+
+const HeaderLine = styled.div`
+  display:flex; justify-content:flex-end; margin-bottom:14px;
+`;
+
+const AddBtn = styled.button`
+  display:flex; align-items:center; gap:8px;
+  background:#ff6a2b; color:#fff; border:0; border-radius:10px;
+  padding:10px 14px; cursor:pointer; font-weight:600;
+  &:hover{ filter:brightness(0.98); }
+`;
+
+const Stack = styled.div`
+  display:flex; flex-direction:column; gap:12px;
+`;
+
+const SectionTitle = styled.div`
+  margin: 14px 0 6px; color:#6b7280; font-size:14px; display:flex; align-items:center; gap:8px;
+  &::before{
+    content:'';
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    background:${({on}) => (on ? '#ff6a2b' : '#9aa0a6')};
+  }
+`;
