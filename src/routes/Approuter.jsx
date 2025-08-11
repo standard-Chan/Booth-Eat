@@ -1,3 +1,4 @@
+// src/routes/AppRouter.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import BoothLayout from "../components/BoothLayout.jsx";
 import MenuPage from "../pages/customer/MenuPage.jsx";
@@ -8,27 +9,39 @@ import OrderCompletePage from "../pages/customer/OrderCompletePage.jsx";
 import OrderHistoryPage from "../pages/customer/OrderHistoryPage.jsx";
 import NotFound from "../components/NotFound.jsx";
 
+// manager pages
+import ManagerOrdersPage from "../pages/manager/OrdersPage.jsx";
+import ManagerMenusPage from "../pages/manager/MenusPage.jsx";
+import ManagerSalesPage from "../pages/manager/SalesPage.jsx";
+import ManagerReportsPage from "../pages/manager/ReportsPage.jsx";
+import ManagerSettingsPage from "../pages/manager/SettingsPage.jsx";
 
 export default function AppRouter() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Navigate to="/booths/1/menu" replace />} />
+    <Routes>
+      {/* 기본: 고객용 메뉴로 */}
+      <Route path="/" element={<Navigate to="/booths/1/menu" replace />} />
 
-        {/* boothId가 포함된 레이아웃 라우트 */}
+      {/* customer 영역 */}
+      <Route path="/booths/:boothId" element={<BoothLayout />}>
+        <Route path="menu" element={<MenuPage />} />
+        <Route path="order" element={<CartPage />} />
+        <Route path="order/confirm" element={<OrderConfirmPage />} />
+        <Route path="order/pending/:orderId" element={<OrderPendingPage />} />
+        <Route path="order/complete/:orderId" element={<OrderCompletePage />} />
+        <Route path="orderHistory" element={<OrderHistoryPage />} />
+      </Route>
 
-        <Route path="/booths/:boothId" element={<BoothLayout />}>
-          <Route path="menu" element={<MenuPage />} />
-          <Route path="order" element={<CartPage />} />
-          <Route path="order/confirm" element={<OrderConfirmPage />} />
-          <Route path="order/pending/:orderId" element={<OrderPendingPage />} />
-          <Route path="order/complete/:orderId" element={<OrderCompletePage />} />
-          <Route path="orderHistory" element={<OrderHistoryPage />} />
-        </Route>
+      {/* manager 영역 */}
+      <Route path="/manager" element={<Navigate to="/manager/booths/1/orders" replace />} />
+      <Route path="/manager/booths/:boothId/orders" element={<ManagerOrdersPage />} />
+      <Route path="/manager/booths/:boothId/menus" element={<ManagerMenusPage />} />
+      <Route path="/manager/booths/:boothId/sales" element={<ManagerSalesPage />} />
+      <Route path="/manager/booths/:boothId/reports" element={<ManagerReportsPage />} />
+      <Route path="/manager/booths/:boothId/settings" element={<ManagerSettingsPage />} />
 
-        {/* 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }

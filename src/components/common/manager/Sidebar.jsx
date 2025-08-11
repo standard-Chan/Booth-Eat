@@ -1,23 +1,25 @@
-// src/components/common/Sidebar.jsx
 import React from 'react';
 import styled from 'styled-components';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { paths } from '../../../routes/paths.js';
+
 
 export default function Sidebar() {
   const { pathname } = useLocation();
+  const { boothId } = useParams();
+  const b = boothId ?? '1';
 
   const menus = [
-    { to: '/orders', label: '주문 관리', icon: 'ㅇㅇ' },
-    { to: '/menus', label: '메뉴 관리', icon: '📖' },
-    { to: '/sales', label: '매출 관리', icon: '👤' },
-    { to: '/reports', label: '비즈니스 리포트', icon: '💬' },
-    { to: '/settings', label: 'Settings', icon: '⚙️' },
+    { to: paths.manager.orders(b),   label: '주문 관리',       icon: 'ㅇㅇ' },
+    { to: paths.manager.menus(b),    label: '메뉴 관리',       icon: '📖' },
+    { to: paths.manager.sales(b),    label: '매출 관리',       icon: '👤' },
+    { to: paths.manager.reports(b),  label: '비즈니스 리포트', icon: '💬' },
+    { to: paths.manager.settings(b), label: 'Settings',       icon: '⚙️' },
   ];
 
   return (
     <SidebarWrap>
       <Brand>Booth-eat</Brand>
-
       <Section>
         {menus.map((m) => (
           <Item key={m.to} to={m.to} $active={pathname.startsWith(m.to)}>
@@ -29,6 +31,7 @@ export default function Sidebar() {
     </SidebarWrap>
   );
 }
+
 
 
 const SidebarWrap = styled.aside`
