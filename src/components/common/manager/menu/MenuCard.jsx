@@ -1,8 +1,8 @@
 // src/components/manager/menu/MenuCard.jsx
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import MenuEditorRow from './MenuEditorRow.jsx';
-import { fetchOrderQty, setAvailable } from '../../../../api/manager/menuApi.js';
+import { getMenuTotalOrders } from '../../../../api/manager/menuApi';
+
 
 const Card = styled.div`
   background: #fff;
@@ -57,47 +57,47 @@ export default function MenuCard({
   item,
   onEdit,
   onDelete,
-  onToggleLocal, // optimistic available toggle
+  onToggleLocal, // (id, nextAvailable) → 페이지에서 API 호출/롤백 처리
 }) {
   const [qty, setQty] = useState(0);
   const [loadingQty, setLoadingQty] = useState(false);
 
   const thumbSrc = useMemo(() => {
     if (!item.previewImage) return null;
-    // 문자열이면 URL로, File이면 blob URL로
     if (typeof item.previewImage === 'string') return item.previewImage;
     if (item.previewImage && item.previewImage.name) {
-      return URL.createObjectURL(item.previewImage);
+      return URL.createObjectURL(item.previewImage); // File/Blob
     }
     return null;
   }, [item.previewImage]);
 
+  // Blob URL 정리
   useEffect(() => {
-    let done = false;
+    return () => {
+      if (thumbSrc && thumbSrc.startsWith('blob:')) URL.revokeObjectURL(thumbSrc);
+    };
+  }, [thumbSrc]);
+
+  // 총 주문량 조회
+  useEffect(() => {
+    let cancelled = false;
     (async () => {
       setLoadingQty(true);
       try {
-        const res = await fetchOrderQty(item.menuItemId);
-        if (!done) setQty(res.totalOrderQuantity ?? 0);
-      } catch (e) {
-        if (!done) setQty(0);
+        const res = await getMenuTotalOrders(item.boothId, item.menuItemId);
+        if (!cancelled) setQty(res?.totalOrderQuantity ?? 0);
+      } catch {
+        if (!cancelled) setQty(0);
       } finally {
-        if (!done) setLoadingQty(false);
+        if (!cancelled) setLoadingQty(false);
       }
     })();
-    return () => { done = true; };
-  }, [item.menuItemId]);
+    return () => { cancelled = true; };
+  }, [item.boothId, item.menuItemId]);
 
-  const handleToggle = async () => {
+  const handleToggle = () => {
     const next = !item.available;
-    onToggleLocal(item.menuItemId, next);
-    try {
-      await setAvailable(item.menuItemId, next);
-    } catch (e) {
-      // 실패 시 되돌리기
-      onToggleLocal(item.menuItemId, !next);
-      alert(e.message);
-    }
+    onToggleLocal(item.menuItemId, next); // 실제 서버 반영/롤백은 부모가 담당
   };
 
   return (
@@ -109,7 +109,6 @@ export default function MenuCard({
           <Name>{item.name}</Name>
           <Meta>
             <span><b>주문량</b>{loadingQty ? '…' : `${qty} 개`}</span>
-            {/* 예측 재고량 생략 */}
           </Meta>
         </div>
       </Left>
@@ -121,16 +120,20 @@ export default function MenuCard({
 
         <IconBtn onClick={() => onEdit(item)}>
           {/* 연필 아이콘 */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/>
+          </svg>
         </IconBtn>
 
         <IconBtn onClick={() => onDelete(item)}>
           {/* 휴지통 아이콘 */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 6h18"/><path d="M8 6V4h8v2"/>
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+          </svg>
         </IconBtn>
       </Right>
     </Card>
   );
 }
-
-// 인라인 수정용 행은 MenuEditorRow.jsx 사용

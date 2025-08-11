@@ -1,357 +1,178 @@
-// src/api/manager/menuApi.js
+import { toURL, API_MANAGER_MENUS } from "../api.js";
 
-import { API_MENU, BASE_URL } from "../api.js";
+/** 공통 응답 핸들러 */
+async function handleResponse(res) {
+  const contentType = res.headers.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
 
-const MOCK = true;
-
-// 공통 fetch 래퍼
-async function req(path, opts = {}) {
-  const url = `${BASE_URL}${path}`;
-  const res = await fetch(url, opts);
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`[${res.status}] ${url} ${text}`);
-  }
-  return res;
-}
-
-const jsonOpts = (method, body) => ({
-  method,
-  headers: { 'Content-Type': 'application/json' },
-  ...(MOCK ? {} : { credentials: 'include' }),
-  body: body != null ? JSON.stringify(body) : undefined,
-});
-
-/** 1) 부스 메뉴 목록 조회 */
-export async function fetchMenus(boothId) {
-  const res = await req(API_MENU.GET_BOOTH_MENUS(boothId), {
-    ...(MOCK ? {} : { credentials: 'include' }),
-  });
-  const rows = await res.json();
-
-  // 스펙 상 비일관성 정규화:
-  // 목록: {menuItemId, available}, 단건: {id, isAvailable}
-  // => 클라에서는 통일해서 { menuItemId, available } 사용
-  return rows.map((m) => ({
-    menuItemId: m.menuItemId ?? m.id,
-    name: m.name,
-    description: m.description,
-    price: m.price,
-    category: m.category,
-    previewImage: m.previewImage ?? m.imageUrl,
-    available: m.available ?? m.isAvailable ?? false,
-  }));
-}
-
-/** 2) 각 메뉴 총 주문량 */
-export async function fetchOrderQty(menuItemId) {
-  const res = await req(API_MENU.GET_MENU_TOTAL_ORDERS(menuItemId), {
-    ...(MOCK ? {} : { credentials: 'include' }),
-  });
-
-  // json-server 라우트 예시: /orderQty?menuItemId=...
-  // 실제 서버: { menuItemId, totalOrderQuantity }
-  const data = await res.json();
-  if (Array.isArray(data)) {
-    const hit = data[0] ?? { totalOrderQuantity: 0 };
-    return { menuItemId, totalOrderQuantity: hit.totalOrderQuantity ?? 0 };
-  }
-  return { menuItemId, totalOrderQuantity: data.totalOrderQuantity ?? 0 };
-}
-
-/** 3) 메뉴 추가 */
-export async function createMenu(
-  boothId,
-  { name, price, description, available, previewImage }
-) {
-  if (MOCK) {
-    // json-server: JSON으로만
-    await req(API_MENU.CREATE_MENU, jsonOpts('POST', {
-      boothId,
-      name,
-      price,
-      description: description ?? '',
-      category: 'FOOD',
-      previewImage: typeof previewImage === 'string' ? previewImage : '/images/sample1.jpg',
-      available: available ?? true,
-    }));
-    return true;
+    let detail;
+    try {
+      detail = isJson ? await res.json() : await res.text();
+    } catch {
+      detail = null;
+    }
+    const message =
+      (detail && (detail.message || detail.error || JSON.stringify(detail))) ||
+      `HTTP ${res.status} ${res.statusText}`;
+    const err = new Error(message);
+    err.status = res.status;
+    err.detail = detail;
+    throw err;
   }
 
-  // 실제 서버: FormData 업로드
-  const fd = new FormData();
-  fd.append('boothId', boothId);
-  fd.append('name', name);
-  fd.append('price', price);
-  if (description != null) fd.append('description', description);
-  if (available != null) fd.append('available', available);
-  if (previewImage) fd.append('previewImage', previewImage);
+  if (res.status === 204) return null;
+  return isJson ? res.json() : res.text();
+}
 
-  await req(API_MENU.CREATE_MENU, {
+/** 헤더 (JSON용) */
+const jsonHeaders = {
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
+};
+
+/**
+ * 메뉴 추가
+ * - previewImage 가 File/Blob 이면 FormData 업로드
+ * - 아니면 JSON 전송
+ * @param {number|string} boothId
+ * @param {{
+ *   name:string,
+ *   price:number,
+ *   available?:boolean,
+ *   previewImage?:string|File|Blob|null,
+ *   description?:string|null,
+ *   category?:'FOOD'|'DRINK'|string
+ * }} data
+ */
+export async function addMenu(boothId, data) {
+  const url = toURL(API_MANAGER_MENUS.ADD_MENU(boothId));
+
+  // File/Blob 이면 FormData 사용
+  const useForm =
+    data?.previewImage instanceof File || data?.previewImage instanceof Blob;
+
+  const options = {
     method: 'POST',
     credentials: 'include',
-    body: fd,
-  });
-  return true;
-}
+  };
 
-/** 4) 메뉴 수정 */
-export async function updateMenu(menuItemId, { name, price, description, previewImage }) {
-  if (MOCK) {
-    // json-server: PATCH JSON
-    const body = {};
-    if (name != null) body.name = name;
-    if (price != null) body.price = price;
-    if (description != null) body.description = description;
-    if (typeof previewImage === 'string') body.previewImage = previewImage;
-
-    await req(API_MENU.UPDATE_MENU(menuItemId), jsonOpts('PATCH', body));
-    return true;
-  }
-
-  // 실제 서버: 이미지 변경 시 FormData, 아니면 JSON
-  const useForm = previewImage instanceof File;
   if (useForm) {
     const fd = new FormData();
-    fd.append('menu_item', menuItemId);
-    if (name != null) fd.append('name', name);
-    if (price != null) fd.append('price', price);
-    if (description != null) fd.append('description', description);
-    fd.append('previewImage', previewImage);
-
-    await req(API_MENU.UPDATE_MENU(menuItemId), {
-      method: 'PATCH',
-      credentials: 'include',
-      body: fd,
-    });
+    fd.append('name', data.name);
+    fd.append('price', String(data.price));
+    if (typeof data.available === 'boolean') fd.append('available', String(data.available));
+    if (data.description != null) fd.append('description', data.description);
+    if (data.category != null) fd.append('category', data.category);
+    fd.append('previewImage', data.previewImage);
+    options.body = fd; // Content-Type 자동 설정 (multipart/form-data)
   } else {
-    await req(API_MENU.UPDATE_MENU(menuItemId), jsonOpts('PATCH', {
-      menu_item: menuItemId,
-      name,
-      price,
-      description,
-    }));
+    options.headers = jsonHeaders;
+    options.body = JSON.stringify({
+      name: data.name,
+      price: data.price,
+      available: data.available ?? true,
+      previewImage: data.previewImage ?? null,
+      description: data.description ?? null,
+      category: data.category ?? 'FOOD',
+    });
   }
-  return true;
+
+  const res = await fetch(url, options);
+  return handleResponse(res);
 }
 
-/** 5) 메뉴 삭제 */
-export async function deleteMenu(menuItemId) {
-  await req(API_MENU.DELETE_MENU(menuItemId), {
+/**
+ * 메뉴 삭제
+ * @param {number|string} boothId
+ * @param {number|string} menuItemId
+ */
+export async function deleteMenu(boothId, menuItemId) {
+  const url = toURL(API_MANAGER_MENUS.DELETE_MENU(boothId, menuItemId));
+  const res = await fetch(url, {
     method: 'DELETE',
-    ...(MOCK ? {} : { credentials: 'include' }),
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
   });
-  return true;
+  return handleResponse(res); // 보통 200/204
 }
 
-/** 6) 판매 상태 변경 */
-export async function setAvailable(menuItemId, available) {
-  if (MOCK) {
-    // json-server: 커스텀 액션 없으니 필드 패치
-    await req(API_MENU.UPDATE_MENU(menuItemId), jsonOpts('PATCH', { available }));
-    return true;
+/**
+ * 메뉴 수정 (부분 수정)
+ * @param {number|string} boothId
+ * @param {number|string} menuItemId
+ * @param {Partial<{name:string, price:number, available:boolean, previewImage:string|File|Blob|null, description:string|null, category:string}>} patch
+ */
+export async function updateMenu(boothId, menuItemId, patch) {
+  const url = toURL(API_MANAGER_MENUS.UPDATE_MENU(boothId, menuItemId));
+
+  // 파일이면 FormData, 아니면 JSON
+  const useForm =
+    patch?.previewImage instanceof File || patch?.previewImage instanceof Blob;
+
+  const options = {
+    method: 'PATCH',
+    credentials: 'include',
+  };
+
+  if (useForm) {
+    const fd = new FormData();
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v === undefined) return;
+      if (k === 'price' && typeof v === 'number') fd.append(k, String(v));
+      else fd.append(k, v);
+    });
+    options.body = fd;
+  } else {
+    options.headers = jsonHeaders;
+    options.body = JSON.stringify(patch);
   }
 
-  await req(API_MENU.SET_MENU_AVAILABLE(menuItemId), jsonOpts('POST', {
-    menu_item: menuItemId,
-    available,
-  }));
-  return true;
+  const res = await fetch(url, options);
+  return handleResponse(res);
 }
 
+/**
+ * 특정 메뉴의 총 주문량
+ * @param {number|string} boothId
+ * @param {number|string} menuItemId
+ * @returns {Promise<{menuItemId:number,totalOrderQuantity:number}>}
+ */
+export async function getMenuTotalOrders(boothId, menuItemId) {
+  const url = toURL(API_MANAGER_MENUS.GET_MENU_TOTAL_ORDERS(boothId, menuItemId));
+  const res = await fetch(url, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
+  });
+  return handleResponse(res);
+}
 
-// // 임시 데이터 ------------------------
-// let MENUS = [
-//   {
-//     menuItemId: 1,
-//     name: '치즈버거',
-//     description: '고소한 치즈와 두툼한 패티',
-//     price: 5000,
-//     category: 'FOOD',
-//     previewImage: '/images/sample1.jpg', // public에 넣거나 base64
-//     available: true,
-//   },
-//   {
-//     menuItemId: 2,
-//     name: '오징어 튀김',
-//     description: '오징어',
-//     price: 7000,
-//     category: 'FOOD',
-//     previewImage: '/images/sample2.jpg',
-//     available: true,
-//   },
-//   {
-//     menuItemId: 3,
-//     name: '김치볶음밥',
-//     description: '불맛 살짝',
-//     price: 6000,
-//     category: 'FOOD',
-//     previewImage: '/images/sample3.jpg',
-//     available: true,
-//   },
-//   {
-//     menuItemId: 4,
-//     name: '오뎅탕',
-//     description: '국물 진함',
-//     price: 4000,
-//     category: 'FOOD',
-//     previewImage: '/images/sample4.jpg',
-//     available: false,
-//   },
-// ];
+/**
+ * 메뉴 판매 가능(available) 토글
+ * @param {number|string} menuItemId
+ * @param {boolean} [nextAvailable]  // 지정 시 그 값으로 세팅, 미지정 시 서버에서 토글
+ * @returns {Promise<{menuItemId:number, available:boolean}>}
+ */
+export async function toggleMenuAvailable(menuItemId, nextAvailable) {
+  const url = toURL(API_MANAGER_MENUS.TOGGLE_AVAILABLE(menuItemId));
+  const body =
+    typeof nextAvailable === 'boolean' ? { available: nextAvailable } : undefined;
 
-// let ORDER_QTY = {
-//   1: 21,
-//   2: 26,
-//   3: 21,
-//   4: 15,
-// };
+  const res = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: body ? jsonHeaders : { Accept: 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  return handleResponse(res);
+}
 
-// let _autoId = 100;
-// const genId = () => ++_autoId;
-// const delay = (ms = 200) => new Promise(r => setTimeout(r, ms));
-
-// // -----------------------------------
-
-// export async function fetchMenus(boothId) {
-//   // boothId는 지금은 무시
-//   await delay();
-//   return MENUS.map(m => ({ ...m })); // 복사본
-// }
-
-// export async function fetchOrderQty(menuItemId) {
-//   await delay();
-//   return { menuItemId, totalOrderQuantity: ORDER_QTY[menuItemId] ?? 0 };
-// }
-
-// export async function createMenu(boothId, { name, price, description, available, previewImage }) {
-//   await delay();
-//   const id = genId();
-//   MENUS.unshift({
-//     menuItemId: id,
-//     name,
-//     price: Number(price),
-//     description: description ?? '',
-//     category: 'FOOD',
-//     previewImage: typeof previewImage === 'string'
-//       ? previewImage
-//       : (previewImage instanceof File ? URL.createObjectURL(previewImage) : null),
-//     available: available ?? true,
-//   });
-//   ORDER_QTY[id] = 0;
-//   return true;
-// }
-
-// export async function updateMenu(menuItemId, { name, price, description, previewImage }) {
-//   await delay();
-//   MENUS = MENUS.map(m => m.menuItemId === menuItemId ? ({
-//     ...m,
-//     name: name ?? m.name,
-//     price: price != null ? Number(price) : m.price,
-//     description: description ?? m.description,
-//     previewImage: previewImage
-//       ? (typeof previewImage === 'string'
-//         ? previewImage
-//         : (previewImage instanceof File ? URL.createObjectURL(previewImage) : m.previewImage))
-//       : m.previewImage,
-//   }) : m);
-//   return true;
-// }
-
-// export async function deleteMenu(menuItemId) {
-//   await delay();
-//   MENUS = MENUS.filter(m => m.menuItemId !== menuItemId);
-//   delete ORDER_QTY[menuItemId];
-//   return true;
-// }
-
-// export async function setAvailable(menuItemId, available) {
-//   await delay();
-//   MENUS = MENUS.map(m => m.menuItemId === menuItemId ? ({ ...m, available }) : m);
-//   return true;
-// }
-
-
-// /*
-// // src/api/manager/menuApi.js
-// const BASE = '/api'; // TODO: 백엔드 준비되면 실제 베이스 경로로 변경
-
-// // 공통 옵션
-// const jsonOpts = (method, body) => ({
-//   method,
-//   headers: { 'Content-Type': 'application/json' },
-//   credentials: 'include',
-//   body: JSON.stringify(body),
-// });
-
-// export async function fetchMenus(boothId) {
-//   const res = await fetch(`${BASE}/booths/${boothId}/menus`, { credentials: 'include' });
-//   if (!res.ok) throw new Error('메뉴 목록 조회 실패');
-//   return res.json(); // [{menuItemId, name, ...}]
-// }
-
-// // 각 메뉴 총 주문량
-// export async function fetchOrderQty(menuItemId) {
-//   const res = await fetch(`${BASE}/menus/${menuItemId}/total-orders`, { credentials: 'include' });
-//   if (!res.ok) throw new Error('주문량 조회 실패');
-//   return res.json(); // { menuItemId, totalOrderQuantity }
-// }
-
-// // 메뉴 추가 (이미지 포함 가능)
-// export async function createMenu(boothId, { name, price, description, available, previewImage }) {
-//   const fd = new FormData();
-//   fd.append('boothId', boothId);
-//   fd.append('name', name);
-//   fd.append('price', price);
-//   fd.append('available', available);
-//   if (description) fd.append('description', description);
-//   if (previewImage) fd.append('previewImage', previewImage); // File 또는 Blob
-
-//   const res = await fetch(`${BASE}/menus`, {
-//     method: 'POST',
-//     credentials: 'include',
-//     body: fd,
-//   });
-//   if (!res.ok) throw new Error('메뉴 추가 실패');
-//   // created 201
-//   return true;
-// }
-
-// // 메뉴 수정 (이미지 바뀌면 FormData, 아니면 JSON)
-// export async function updateMenu(menuItemId, { name, price, description, previewImage }) {
-//   const useForm = previewImage instanceof File;
-//   if (useForm) {
-//     const fd = new FormData();
-//     fd.append('menu_item', menuItemId);
-//     if (name != null) fd.append('name', name);
-//     if (price != null) fd.append('price', price);
-//     if (description != null) fd.append('description', description);
-//     fd.append('previewImage', previewImage);
-//     const res = await fetch(`${BASE}/menus/${menuItemId}`, { method: 'PATCH', credentials: 'include', body: fd });
-//     if (!res.ok) throw new Error('메뉴 수정 실패');
-//     return true;
-//   } else {
-//     const res = await fetch(`${BASE}/menus/${menuItemId}`, jsonOpts('PATCH', {
-//       menu_item: menuItemId,
-//       name, price, description,
-//     }));
-//     if (!res.ok) throw new Error('메뉴 수정 실패');
-//     return true;
-//   }
-// }
-
-// export async function deleteMenu(menuItemId) {
-//   const res = await fetch(`${BASE}/menus/${menuItemId}`, { method: 'DELETE', credentials: 'include' });
-//   if (!res.ok) throw new Error('메뉴 삭제 실패');
-//   return true; // OK 200
-// }
-
-// export async function setAvailable(menuItemId, available) {
-//   const res = await fetch(`${BASE}/menus/${menuItemId}/available`, jsonOpts('POST', {
-//     menu_item: menuItemId, // (백엔드 필드 철자 확인 필요)
-//     available,
-//   }));
-//   if (!res.ok) throw new Error('판매 상태 변경 실패');
-//   return true;
-// }
-// */
+// 편의 export
+export default {
+  addMenu,
+  deleteMenu,
+  updateMenu,
+  getMenuTotalOrders,
+  toggleMenuAvailable,
+};
