@@ -7,6 +7,7 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
 
   // 모달 열릴 때마다 수량 초기화
   useEffect(() => {
+    console.log(item)
     if (open) {
       setQty(1);
     }
@@ -43,8 +44,8 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
       </PriceRow>
 
       <Bottom>
-        <AddButton onClick={add} disabled={!item.isAvailable}>
-          {item.isAvailable ? "장바구니 담기" : "품절"}
+        <AddButton onClick={add} disabled={!item.available}>
+          {item.available ? "장바구니 담기" : "품절"}
         </AddButton>
       </Bottom>
     </Modal>
