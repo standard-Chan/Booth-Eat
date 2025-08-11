@@ -11,10 +11,10 @@ import NotFound from "../components/NotFound.jsx";
 
 // manager pages
 import ManagerOrdersPage from "../pages/manager/OrdersPage.jsx";
-import ManagerMenusPage from "../pages/manager/MenusPage.jsx";
 import ManagerSalesPage from "../pages/manager/SalesPage.jsx";
 import ManagerReportsPage from "../pages/manager/ReportsPage.jsx";
 import ManagerSettingsPage from "../pages/manager/SettingsPage.jsx";
+import MenuManagePage from "../pages/manager/MenuManagePage.jsx";
 
 export default function AppRouter() {
   return (
@@ -35,7 +35,7 @@ export default function AppRouter() {
       {/* manager 영역 */}
       <Route path="/manager" element={<Navigate to="/manager/booths/1/orders" replace />} />
       <Route path="/manager/booths/:boothId/orders" element={<ManagerOrdersPage />} />
-      <Route path="/manager/booths/:boothId/menus" element={<ManagerMenusPage />} />
+      <Route path="/manager/booths/:boothId/menus" element={<MenuManagePage />} />
       <Route path="/manager/booths/:boothId/sales" element={<ManagerSalesPage />} />
       <Route path="/manager/booths/:boothId/reports" element={<ManagerReportsPage />} />
       <Route path="/manager/booths/:boothId/settings" element={<ManagerSettingsPage />} />
