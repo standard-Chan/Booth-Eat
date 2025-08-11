@@ -6,7 +6,6 @@ import OrderCard from "./OrderCard.jsx";
 import { getTableOrders, setOrderStatus } from "../../api/manager/orderApi.js";
 
 
-
 export default function OrderHistoryModal({
   open,
   boothId,
@@ -28,7 +27,7 @@ export default function OrderHistoryModal({
     (async () => {
       try {
         const data = await getTableOrders(boothId, tableId);
-        setOrders(data || []);
+        setOrders(Array.isArray(data) ? data : []);
       } catch (e) {
         setError("주문 이력을 불러오지 못했습니다.");
       } finally {
@@ -37,12 +36,12 @@ export default function OrderHistoryModal({
     })();
   }, [open, boothId, tableId]);
 
+  // 최신순(생성시간) 정렬
   const sorted = useMemo(
     () =>
       [...orders].sort(
         (a, b) =>
-          +new Date(b?.customerOrder?.created_at || 0) -
-          +new Date(a?.customerOrder?.created_at || 0)
+          +new Date(b?.createdAt || 0) - +new Date(a?.createdAt || 0)
       ),
     [orders]
   );
@@ -63,36 +62,37 @@ export default function OrderHistoryModal({
     )}.${String(d.getDate()).padStart(2, "0")}`;
   };
 
+  // 팝업에서 개별 주문만 FINISHED 처리
   const handleFinishOne = async (orderId) => {
     try {
       await setOrderStatus(orderId, "FINISHED");
       const data = await getTableOrders(boothId, tableId);
-      setOrders(data || []);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (e) {
       alert("주문 완료 처리에 실패했습니다.");
     }
   };
 
+  // ★ API 응답 형태에 맞춰 매핑 (플랫 + items + payment)
   const toCardProps = (o) => {
-    const co = o?.customerOrder || {};
-    const status = (co.status || "").toUpperCase();
-    const amount = o?.paymentInfo?.amount ?? co?.total_amount ?? 0;
+    const status = (o?.status || "").toUpperCase(); // PENDING | APPROVED | REJECTED | FINISHED
+    const amount = o?.payment?.amount ?? o?.totalAmount ?? 0;
 
     return {
       tableNo: tableNumber,
-      timeText: `${fmtYMD(co.created_at)} ${fmtHM(co.created_at)}`,
+      timeText: `${fmtYMD(o?.createdAt)} ${fmtHM(o?.createdAt)}`,
       active: true,
-      orderStatus: status, // PENDING | APPROVED | REJECTED | FINISHED
-      items: (o?.orderItems || []).map((it) => ({
+      orderStatus: status,
+      items: (o?.items || []).map((it) => ({
         name: it.name,
-        qty: it.quantity ?? it.qty ?? 0,
+        qty: it.quantity ?? 0,
       })),
-      customerName: o?.paymentInfo?.payer_name || "-",
+      customerName: o?.payment?.payerName || "-",
       addAmount: amount,
       totalAmount: amount,
       onApprove: undefined,
       onReject: undefined,
-      onClear: () => handleFinishOne(co.order_id), // 이 주문만 FINISHED
+      onClear: () => handleFinishOne(o?.orderId), // 이 주문만 FINISHED
       onReceiptClick: () => {},
     };
   };
@@ -109,7 +109,7 @@ export default function OrderHistoryModal({
         <List ref={listRef}>
           {sorted.map((o, i) => (
             <CardWrap
-              key={o?.customerOrder?.order_id || `${i}`}
+              key={o?.orderId ?? o?.id ?? `${i}`}
               ref={(el) => (colRefs.current[i] = el)}
             >
               <OrderCard {...toCardProps(o)} />
