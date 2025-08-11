@@ -9,7 +9,7 @@ import { paths } from '../../routes/paths.js';
 import { showSuccessToast } from '../../utils/toast.js';
 
 export default function OrderPendingPage() {
-  const { boothId, orderId } = useParams();
+  const { boothId, orderId, tableId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -20,13 +20,13 @@ export default function OrderPendingPage() {
     // 데모: 2초 후 완료 페이지로 이동
     const t = setTimeout(() => {
       showSuccessToast("결제 확인이 완료되었습니다.");
-      navigate(paths.complete(boothId, orderId));
+      navigate(paths.complete(boothId, tableId, orderId));
     }, 4000);
 
     return () => clearTimeout(t);
   }, [boothId, orderId, navigate, dispatch]);
 
-  const goHome = () => navigate(paths.menu(boothId));
+  const goHome = () => navigate(paths.menu(boothId, tableId));
 
   return (
     <Page>

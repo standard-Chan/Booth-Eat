@@ -26,7 +26,7 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
         <CloseBtn onClick={onClose}>✕</CloseBtn>
       </Header>
 
-      {item.imageUrl && <Hero src={item.imageUrl} alt={item.name} />}
+      {item.previewImage && <Hero src={item.previewImage} alt={item.name} />}
 
       <NameWrapper>
         

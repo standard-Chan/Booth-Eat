@@ -1,37 +1,64 @@
-// src/api/manager/salesApi.js
-// 실제 API 붙일 때 delay()와 아래 목 데이터만 걷어내고 fetch로 교체하면 됨.
+// 매출 관리 API 래퍼 (axios)
+// - 오늘의 메뉴 랭킹은 사용하지 않음
+import axios from "axios";
+import { BASE_URL, API_MANAGER_SALES } from "../api.js";
 
-const delay = (ms=200) => new Promise(r=>setTimeout(r, ms));
+const http = axios.create({
+  baseURL: BASE_URL,        // e.g. http://localhost:8080/api
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
 
-/** 1) 특정 날짜 매출 요약 */
-export async function fetchBoothDailySummary(boothId, date /* 'YYYY-MM-DD' */) {
-  await delay();
-  // 임시 값
-  return {
-    date,
-    totalSales: 684000,
-    orderNumbers: 44,
-  };
+const parseErr = (e) => {
+  if (e.response) {
+    const { status, data } = e.response;
+    const msg = (data && (data.message || data.error)) || "Request failed";
+    return new Error(`[${status}] ${msg}`);
+  }
+  if (e.request) return new Error("No response from server");
+  return new Error(e.message || "Unknown error");
+};
+
+/** 1) 특정 날짜 일일 요약 */
+export async function fetchBoothDailySummary(boothId, yyyyMMdd) {
+  if (boothId == null) throw new Error("boothId가 필요합니다.");
+  if (!yyyyMMdd) throw new Error("yyyy-MM-dd 형식의 날짜가 필요합니다.");
+  try {
+    const url = API_MANAGER_SALES.GET_DATE_SALES(boothId, yyyyMMdd);
+    const { data } = await http.get(url);
+    // API 명세에 맞춰 그대로 리턴 (date, totalSales, orderNumbers)
+    return data;
+  } catch (e) {
+    throw parseErr(e);
+  }
 }
 
-/** 2) 부스의 메뉴별 판매액(총액 기준) */
+/** 2) 메뉴별 판매액 합계 */
 export async function fetchMenuSales(boothId) {
-  await delay();
-  // 임시 값: name, totalSales(원)
-  return [
-    { menuItemId: 1, name: '오징어 튀김', totalSales: 98000 },
-    { menuItemId: 2, name: '떡볶이',     totalSales: 140000 },
-    { menuItemId: 3, name: '김치볶음밥', totalSales: 90000 },
-    { menuItemId: 4, name: '오뎅탕',     totalSales: 210000 },
-    { menuItemId: 5, name: '사이다',     totalSales: 85000 },
-  ];
+  if (boothId == null) throw new Error("boothId가 필요합니다.");
+  try {
+    const url = API_MANAGER_SALES.GET_MENU_SALES(boothId);
+    const { data } = await http.get(url);
+    // [{ menuItemId, name, totalSales }, ...]
+    return Array.isArray(data) ? data : [];
+  } catch (e) {
+    throw parseErr(e);
+  }
 }
 
-/** (옵션) 어제값: 데모용 비교 막대 생성 */
-export function makeYesterdaySeries(todayList) {
-  // 어제는 70%~95% 사이로 랜덤 스케일
-  return todayList.map(it => ({
-    ...it,
-    totalSales: Math.round(it.totalSales * (0.7 + Math.random() * 0.25)),
-  }));
+/** 3) 데모용: 어제 시리즈 생성 (안정적인 10~25% 감소/증가 랜덤, item별 고정) */
+export function makeYesterdaySeries(todayList = []) {
+  // menuItemId 기준으로 결정적 난수 → 변동폭 고정
+  const hash = (n) => {
+    let x = Number(n) || 0;
+    x = ((x << 13) ^ x) >>> 0;
+    return (1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 0x7fffffff);
+  };
+  return todayList.map((it) => {
+    const h = Math.abs(hash(it.menuItemId)) ; // 0~1
+    const delta = 0.10 + (h * 0.15);          // 10% ~ 25%
+    const sign = h > 0.5 ? -1 : 1;            // 절반 확률로 감소/증가
+    const y = Math.max(0, Math.round(it.totalSales * (1 + sign * delta)));
+    return { ...it, totalSales: y };
+  });
 }

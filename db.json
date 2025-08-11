@@ -57,17 +57,75 @@
       "previewImage": null,
       "description": "몰라",
       "category": "FOOD"
-    }
-  ],
-  "accounts": [
+    },
     {
-      "id": 1,
+      "id": 6,
+      "menuItemId": 6,
       "boothId": 1,
-      "bank": "카카오뱅크",
-      "account": "123-****-****",
-      "accountHolder": "정석찬"
+      "name": "메뉴",
+      "price": 3232,
+      "available": false,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "",
+      "category": "FOOD"
+    },
+    {
+      "id": 7,
+      "menuItemId": 7,
+      "boothId": 1,
+      "name": "새로운 메뉴",
+      "price": 123232,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "23232",
+      "category": "FOOD"
+    },
+    {
+      "id": 8,
+      "menuItemId": 8,
+      "boothId": 1,
+      "name": "메뉴",
+      "price": 0,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": null,
+      "category": "FOOD"
+    },
+    {
+      "id": 9,
+      "menuItemId": 9,
+      "boothId": 2,
+      "name": "ㅇㄴㅁ",
+      "price": 323,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "2131",
+      "category": "FOOD"
+    },
+    {
+      "id": 10,
+      "menuItemId": 10,
+      "boothId": 2,
+      "name": "ㅁㅇㅁㄴㅇㅁ",
+      "price": 2313123,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "3213213",
+      "category": "FOOD"
     }
   ],
+  "accounts": {
+    "id": 1,
+    "boothId": 1,
+    "bank": "카카오뱅크",
+    "account": "123-****-****",
+    "accountHolder": "정석찬"
+  },
   "tables": [
     {
       "id": 1,
@@ -81,7 +139,7 @@
       "tableId": 2,
       "boothId": 1,
       "tableNumber": 2,
-      "active": true
+      "active": false
     },
     {
       "id": 3,
@@ -151,6 +209,15 @@
       "status": "OPEN",
       "startedAt": "2025-08-11T02:10:00Z",
       "closedAt": null
+    },
+    {
+      "id": 12,
+      "visitId": 20,
+      "tableId": 2,
+      "visitNo": 1,
+      "status": "CLOSED",
+      "startedAt": "2025-08-11T02:30:00Z",
+      "closedAt": "2025-08-11T20:41:28.749Z"
     }
   ],
   "orders": [
@@ -193,7 +260,7 @@
       "boothId": 1,
       "tableId": 1,
       "visitId": 10,
-      "status": "APPROVED",
+      "status": "FINISHED",
       "orderCode": "BE-20250811-000124",
       "totalAmount": 10000,
       "createdAt": "2025-08-11T01:23:45Z",
@@ -245,6 +312,93 @@
         "payerName": "김철수",
         "amount": 15000
       }
+    },
+    {
+      "id": 129,
+      "orderId": 129,
+      "boothId": 1,
+      "tableId": 2,
+      "visitId": 20,
+      "status": "FINISHED",
+      "orderCode": "BE-20250811-000129",
+      "totalAmount": 10000,
+      "createdAt": "2025-08-11T01:23:45Z",
+      "approvedAt": "2025-08-11T01:25:00Z",
+      "tableNo": 2,
+      "items": [
+        {
+          "foodId": 1,
+          "name": "핫도그",
+          "price": 4000,
+          "imageUrl": null,
+          "quantity": 2
+        },
+        {
+          "foodId": 3,
+          "name": "콜라",
+          "price": 2000,
+          "imageUrl": null,
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "홍길동",
+        "amount": 10000
+      }
+    },
+    {
+      "boothId": 2,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      },
+      "id": 130
+    },
+    {
+      "boothId": 2,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      },
+      "id": 131
+    },
+    {
+      "boothId": 1,
+      "tableNo": "1",
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "1231",
+        "amount": 4500
+      },
+      "id": 132
     }
   ],
   "menuMetrics": [

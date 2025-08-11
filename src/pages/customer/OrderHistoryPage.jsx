@@ -17,10 +17,10 @@ const STATUS_MAP = {
 };
 
 export default function OrderHistoryPage() {
-  const { boothId } = useParams();
+  const { boothId, tableId } = useParams();
   const navigate = useNavigate();
 
-  const goMenu = () => navigate(paths.menu(boothId));
+  const goMenu = () => navigate(paths.menu(boothId, tableId));
 
   const formatDate = (iso) => {
     const d = new Date(iso);

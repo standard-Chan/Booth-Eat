@@ -13,7 +13,7 @@ import { listMenusByBooth } from '../../api/customerApi.js';
 import { MOCK_FOOD } from '../../test/mock.js';
 
 export default function MenuPage() {
-  const { boothId } = useParams();
+  const { boothId, tableId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -82,8 +82,8 @@ export default function MenuPage() {
     <Page>
       <Header
         title="Menu"
-        onLeft={() => navigate(paths.orderHistory(boothId))}
-        onRight={() => navigate(paths.cart(boothId))}
+        onLeft={() => navigate(paths.orderHistory(boothId, tableId))}
+        onRight={() => navigate(paths.cart(boothId, tableId))}
       />
 
       {loading ? (
@@ -136,7 +136,7 @@ export default function MenuPage() {
 
       <BottomSpacer />
       <BottomBar>
-        <OrderButton onClick={() => navigate(paths.cart(boothId))}>주문하기</OrderButton>
+        <OrderButton onClick={() => navigate(paths.cart(boothId, tableId))}>주문하기</OrderButton>
       </BottomBar>
 
       <FoodDetailModal

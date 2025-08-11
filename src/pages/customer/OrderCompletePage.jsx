@@ -5,11 +5,11 @@ import Header from "../../components/common/Header.jsx";
 import { paths } from "../../routes/paths.js";
 
 export default function OrderCompletePage() {
-  const { boothId, orderId } = useParams();
+  const { boothId, orderId, tableId } = useParams();
   const navigate = useNavigate();
 
-  const goMenu = () => navigate(paths.menu(boothId));
-  const goOrders = () => navigate(paths.orderHistory(boothId));
+  const goMenu = () => navigate(paths.menu(boothId, tableId));
+  const goOrders = () => navigate(paths.orderHistory(boothId, tableId));
 
   return (
     <Page>

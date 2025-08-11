@@ -7,11 +7,9 @@ export default function Header({ title = "주문 관리" }) {
     <HeaderBar>
       <Title>{title}</Title>
       <Right>
-        <Bell aria-label="알림">🔔</Bell>
-        <Avatar
-          src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop"
-          alt="avatar"
-        />
+        {/* <Bell aria-label="알림">🔔</Bell> */}
+        {/* <Avatar
+        /> */}
       </Right>
     </HeaderBar>
   );

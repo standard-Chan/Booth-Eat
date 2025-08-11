@@ -20,10 +20,10 @@ export default function AppRouter() {
   return (
     <Routes>
       {/* 기본: 고객용 메뉴로 */}
-      <Route path="/" element={<Navigate to="/booths/1/menu" replace />} />
+      <Route path="/" element={<Navigate to="/booths/1/tables/1/menu" replace />} />
 
       {/* customer 영역 */}
-      <Route path="/booths/:boothId" element={<BoothLayout />}>
+      <Route path="/booths/:boothId/tables/:tableId" element={<BoothLayout />}>
         <Route path="menu" element={<MenuPage />} />
         <Route path="order" element={<CartPage />} />
         <Route path="order/confirm" element={<OrderConfirmPage />} />

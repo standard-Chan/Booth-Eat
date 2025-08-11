@@ -1,12 +1,12 @@
 // src/routes/paths.js
 export const paths = {
   // customer
-  menu: (boothId) => `/booths/${boothId}/menu`,
-  cart: (boothId) => `/booths/${boothId}/order`,
-  confirm: (boothId) => `/booths/${boothId}/order/confirm`,
-  pending: (boothId, orderId) => `/booths/${boothId}/order/pending/${orderId}`,
-  complete: (boothId, orderId) => `/booths/${boothId}/order/complete/${orderId}`,
-  orderHistory: (boothId) => `/booths/${boothId}/orderHistory`,
+  menu: (boothId, tableId) => `/booths/${boothId}/tables/${tableId}/menu`,
+  cart: (boothId, tableId) => `/booths/${boothId}/tables/${tableId}/order`,
+  confirm: (boothId, tableId) => `/booths/${boothId}/tables/${tableId}/order/confirm`,
+  pending: (boothId, tableId, orderId) => `/booths/${boothId}/tables/${tableId}/order/pending/${orderId}`,
+  complete: (boothId, tableId, orderId) => `/booths/${boothId}/tables/${tableId}/order/complete/${orderId}`,
+  orderHistory: (boothId, tableId) => `/booths/${boothId}/tables/${tableId}/orderHistory`,
 
   // manager
   manager: {

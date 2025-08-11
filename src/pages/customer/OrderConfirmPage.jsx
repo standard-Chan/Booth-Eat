@@ -1,37 +1,110 @@
-import React, { useState } from "react";
+// src/pages/customer/OrderConfirmPage.jsx
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "../../components/common/Header.jsx";
-import { selectCartTotalAmount } from "../../store/cartSlice.js";
+import { selectCartTotalAmount, selectCartItems } from "../../store/cartSlice.js";
 import { paths } from "../../routes/paths.js";
 import { showErrorToast, showSuccessToast } from "../../utils/toast.js";
-
-const MOCK_ACCOUNT = {
-  bank: "카카오뱅크",
-  account: "123-****-****",
-  accountHolder: "정석찬",
-};
+import { getBoothAccount, createOrder } from "../../api/customerApi.js";
 
 export default function OrderConfirmPage() {
-  const { boothId } = useParams();
+  const { boothId, tableId } = useParams();
   const navigate = useNavigate();
+
   const totalAmount = useSelector(selectCartTotalAmount);
+  const cartItems = useSelector(selectCartItems); // 없으면: (state) => state.cart.items
+
+  const [account, setAccount] = useState(null);
+  const [accLoading, setAccLoading] = useState(true);
+  const [accError, setAccError] = useState(null);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
+  // 계좌정보 API
+  useEffect(() => {
+    let canceled = false;
+    async function fetchAccount() {
+      try {
+        setAccLoading(true);
+        const data = await getBoothAccount(Number(boothId));
+        if (!canceled) {
+          setAccount(data);
+          setAccError(null);
+        }
+      } catch (e) {
+        if (!canceled) {
+          setAccount(null);
+          setAccError("계좌 정보를 불러오지 못했습니다.");
+        }
+        // eslint-disable-next-line no-console
+        console.error(e);
+      } finally {
+        if (!canceled) setAccLoading(false);
+      }
+    }
+    if (boothId) fetchAccount();
+    return () => { canceled = true; };
+  }, [boothId]);
 
-  // account API로 가져오는 로직 
+  // 입력값 정리
+  const cleanPhone = useMemo(() => phone.replace(/[^\d]/g, ""), [phone]);
 
-  const submit = () => {
+  // (가능하면 이전 단계에서 설정한 테이블 번호를 세션/스토리지에서 꺼내도록 시도)
+  const tableNo = useMemo(() => {
+    const s = sessionStorage.getItem("tableNo");
+    const n = Number(s);
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  }, []);
+
+  const submit = async () => {
     if (!name.trim()) return showErrorToast("성함을 입력해주세요.");
-    if (!phone.trim()) return showErrorToast("전화번호를 입력해주세요.");
+    if (!cleanPhone.trim()) return showErrorToast("전화번호를 입력해주세요.");
     if (!agree) return showErrorToast("개인정보 수집·이용에 동의해주세요.");
-    const dummyOrderId = "ODR12345";
-    showSuccessToast(`${name}님의 주문요청이 관리자에게 전달되었습니다.`)
-    navigate(paths.pending(boothId, dummyOrderId));
+    if (!Array.isArray(cartItems) || cartItems.length === 0)
+      return showErrorToast("장바구니가 비어 있습니다.");
+
+    try {
+      setSubmitting(true);
+
+      // cart → API payload 매핑 (이미 cartSlice.addItem에서 같은 스키마 사용 중)
+      const items = cartItems.map((it) => ({
+        foodId: it.foodId,
+        name: it.name,
+        price: it.price,
+        imageUrl: it.imageUrl || "",
+        quantity: it.quantity,
+      }));
+
+      const payload = {
+        boothId: Number(boothId),
+        tableNo: tableId,
+        items,
+        payment: {
+          payerName: name.trim(),
+          amount: Number(totalAmount) || 0,
+        },
+      };
+
+      const res = await createOrder(payload);
+      const orderId = res?.orderId;
+      if (!orderId) {
+        throw new Error("주문번호가 응답에 없습니다.");
+      }
+
+      showSuccessToast(`${name}님의 주문요청이 관리자에게 전달되었습니다.`);
+      navigate(paths.pending(boothId, tableId, orderId));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      showErrorToast("주문 요청에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -44,38 +117,49 @@ export default function OrderConfirmPage() {
       />
 
       <Body>
-        {/* 결제/계좌 영역은 이전 코드 그대로 */}
+        {/* 결제 요약 */}
         <Section>
           <H2>결제</H2>
           <Row>
             <Label>총 금액</Label>
-            <Value>{totalAmount.toLocaleString()}</Value>
+            <Value>{(Number(totalAmount) || 0).toLocaleString()}</Value>
           </Row>
         </Section>
+
         <Divider />
+
+        {/* 계좌 이체 정보 */}
         <Section>
           <H2>계좌이체</H2>
           <Helper>
             아래 계좌번호에 주문자님 성함으로 계좌이체 부탁드립니다.
           </Helper>
-          <AccountGrid>
-            <Col>
-              <Sub>은행</Sub>
-              <Strong>{MOCK_ACCOUNT.bank}</Strong>
-            </Col>
-            <Col>
-              <Sub>계좌번호</Sub>
-              <Strong>{MOCK_ACCOUNT.account}</Strong>
-            </Col>
-            <Col>
-              <Sub>예금주</Sub>
-              <Strong>{MOCK_ACCOUNT.accountHolder}</Strong>
-            </Col>
-          </AccountGrid>
+
+          {accLoading ? (
+            <Skeleton>계좌 정보를 불러오는 중…</Skeleton>
+          ) : accError ? (
+            <ErrorText>{accError}</ErrorText>
+          ) : (
+            <AccountGrid>
+              <Col>
+                <Sub>은행</Sub>
+                <Strong>{account?.bank || "-"}</Strong>
+              </Col>
+              <Col>
+                <Sub>계좌번호</Sub>
+                <Strong>{account?.account || "-"}</Strong>
+              </Col>
+              <Col>
+                <Sub>예금주</Sub>
+                <Strong>{account?.accountHolder || "-"}</Strong>
+              </Col>
+            </AccountGrid>
+          )}
         </Section>
+
         <Divider />
 
-        {/* 입력 영역 - 스타일 업데이트 */}
+        {/* 입력 영역 */}
         <Section>
           <H3>주문자님 정보를 입력해주세요!</H3>
 
@@ -105,13 +189,15 @@ export default function OrderConfirmPage() {
       </Body>
 
       <Bottom>
-        <SubmitBtn onClick={submit}>제출</SubmitBtn>
+        <SubmitBtn onClick={submit} disabled={submitting || accLoading}>
+          {submitting ? "전송 중…" : "제출"}
+        </SubmitBtn>
       </Bottom>
     </Page>
   );
 }
 
-/* ===== styled (입력 컴포넌트만 변경) ===== */
+/* ===== styled ===== */
 const Page = styled.div`
   max-width: 560px;
   margin: 0 auto;
@@ -157,6 +243,16 @@ const Helper = styled.p`
   color: #7a5f54;
   line-height: 1.5;
 `;
+const Skeleton = styled.div`
+  padding: 16px 8px;
+  color: #9a877b;
+  font-size: 14px;
+`;
+const ErrorText = styled.div`
+  padding: 16px 8px;
+  color: #d04545;
+  font-size: 14px;
+`;
 const AccountGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1.4fr 1fr;
@@ -176,24 +272,22 @@ const Strong = styled.div`
   font-weight: 700;
 `;
 
-/* ▼ 여기부터 ‘입력 버튼(=입력 박스)’ 시안 스타일 */
+/* ▼ 입력 영역 */
 const InputBox = styled.div`
   margin: 10px 0;
-  background: #f4efeb; /* 연한 베이지 */
-  border-radius: 16px; /* 둥글게 */
-  padding: 0 16px; /* 내부 패딩 */
-  height: 56px; /* 고정 높이 */
+  background: #f4efeb;
+  border-radius: 16px;
+  padding: 0 16px;
+  height: 56px;
   display: flex;
   align-items: center;
-  border: 1px solid transparent; /* 포커스 시 색만 변경 */
+  border: 1px solid transparent;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
-
   &:has(input:focus) {
     border-color: #e6d9cf;
     box-shadow: 0 0 0 3px rgba(230, 217, 207, 0.35);
   }
 `;
-
 const Input = styled.input`
   flex: 1;
   height: 100%;
@@ -202,12 +296,10 @@ const Input = styled.input`
   outline: none;
   font-size: 16px;
   color: #523d33;
-
   &::placeholder {
     color: #bfa79a;
-  } /* 시안처럼 연한 브라운 */
+  }
 `;
-
 const Agree = styled.button`
   margin-top: 6px;
   display: flex;
@@ -219,7 +311,6 @@ const Agree = styled.button`
   padding: 6px 0;
   font-size: 16px;
 `;
-
 const Check = styled.span`
   width: 24px;
   height: 24px;
@@ -240,7 +331,6 @@ const Bottom = styled.div`
   width: min(520px, 92vw);
   padding: 0 8px;
 `;
-
 const SubmitBtn = styled.button`
   width: 100%;
   height: 56px;
@@ -252,4 +342,8 @@ const SubmitBtn = styled.button`
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(239, 106, 59, 0.25);
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;

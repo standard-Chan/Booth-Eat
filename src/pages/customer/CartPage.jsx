@@ -15,7 +15,7 @@ import { paths } from "../../routes/paths.js";
 import { showErrorToast } from "../../utils/toast.js";
 
 export default function CartPage() {
-  const { boothId } = useParams();
+  const { boothId, tableId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const items = useSelector(selectCartItems);
@@ -26,14 +26,14 @@ export default function CartPage() {
       showErrorToast("장바구니가 비어있습니다.");
       return;
     }
-    navigate(paths.confirm(boothId));
+    navigate(paths.confirm(boothId, tableId));
   };
 
   return (
     <Page>
       <Header
         title="장바구니"
-        onLeft={() => navigate(paths.orderHistory(boothId))}
+        onLeft={() => navigate(paths.orderHistory(boothId, tableId))}
         onRight={() => {}}
       />
 
@@ -41,7 +41,7 @@ export default function CartPage() {
         {items.length === 0 ? (
           <Empty>
             장바구니가 비어있습니다.
-            <EmptyBtn onClick={() => navigate(paths.menu(boothId))}>
+            <EmptyBtn onClick={() => navigate(paths.menu(boothId, tableId))}>
               메뉴 보러가기
             </EmptyBtn>
           </Empty>
@@ -67,7 +67,7 @@ export default function CartPage() {
         </TotalRow>
 
         <PrimaryBtn onClick={goConfirm}>주문 확인하기</PrimaryBtn>
-        <SecondaryBtn onClick={() => navigate(paths.menu(boothId))}>
+        <SecondaryBtn onClick={() => navigate(paths.menu(boothId, tableId))}>
           더 담으러 가기
         </SecondaryBtn>
       </BottomArea>
