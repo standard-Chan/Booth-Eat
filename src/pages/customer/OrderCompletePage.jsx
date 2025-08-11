@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "../components/common/Header.jsx";
-import { paths } from "../routes/paths.js";
+import Header from "../../components/common/Header.jsx";
+import { paths } from "../../routes/paths.js";
 
 export default function OrderCompletePage() {
   const { boothId, orderId } = useParams();

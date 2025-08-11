@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Header from "../components/common/Header.jsx";
-import { selectCartTotalAmount } from "../store/cartSlice.js";
-import { paths } from "../routes/paths.js";
-import { showErrorToast, showSuccessToast } from "../utils/toast.js";
+import Header from "../../components/common/Header.jsx";
+import { selectCartTotalAmount } from "../../store/cartSlice.js";
+import { paths } from "../../routes/paths.js";
+import { showErrorToast, showSuccessToast } from "../../utils/toast.js";
 
 const MOCK_ACCOUNT = {
   bank: "카카오뱅크",

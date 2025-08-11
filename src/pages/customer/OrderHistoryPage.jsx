@@ -2,9 +2,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import Header from '../components/common/Header.jsx';
-import { paths } from '../routes/paths.js';
-import { MOCK_ORDERS as MOCK } from '../test/mock.js';
+import Header from '../../components/common/Header.jsx';
+import { paths } from '../../routes/paths.js';
+import { MOCK_ORDERS as MOCK } from '../../test/mock.js';
 
 // API 응답 예시(목록) — 실제에선 서버 배열로 교체
 const MOCK_ORDERS = MOCK;

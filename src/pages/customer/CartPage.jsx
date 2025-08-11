@@ -8,11 +8,11 @@ import {
   removeItem,
   selectCartItems,
   selectCartTotalAmount,
-} from "../store/cartSlice.js";
-import Header from "../components/common/Header.jsx";
-import CartItem from "../components/cart/CartItem.jsx";
-import { paths } from "../routes/paths.js";
-import { showErrorToast } from "../utils/toast.js";
+} from "../../store/cartSlice.js";
+import Header from "../../components/common/Header.jsx";
+import CartItem from "../../components/cart/CartItem.jsx";
+import { paths } from "../../routes/paths.js";
+import { showErrorToast } from "../../utils/toast.js";
 
 export default function CartPage() {
   const { boothId } = useParams();

@@ -1,14 +1,14 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/common/Header.jsx';
-import FoodCard from '../components/menu/FoodCard.jsx';
-import FoodDetailModal from '../components/menu/FoodDetailModal.jsx';
-import { paths } from '../routes/paths.js';
-import { MOCK_FOOD } from '../test/mock.js'; 
-import { addItem } from '../store/cartSlice.js';
+import Header from '../../components/common/Header.jsx';
+import FoodCard from '../../components/menu/FoodCard.jsx';
+import FoodDetailModal from '../../components/menu/FoodDetailModal.jsx';
+import { paths } from '../../routes/paths.js';
+import { MOCK_FOOD } from '../../test/mock.js'; 
+import { addItem } from '../../store/cartSlice.js';
 import { useDispatch } from 'react-redux';
-import { showSuccessToast } from '../utils/toast.js';
+import { showSuccessToast } from '../../utils/toast.js';
 
 const MOCK = MOCK_FOOD;
 

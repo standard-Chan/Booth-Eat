@@ -3,10 +3,10 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { clear } from '../store/cartSlice.js';
-import Header from '../components/common/Header.jsx';
-import { paths } from '../routes/paths.js';
-import { showSuccessToast } from '../utils/toast.js';
+import { clear } from '../../store/cartSlice.js';
+import Header from '../../components/common/Header.jsx';
+import { paths } from '../../routes/paths.js';
+import { showSuccessToast } from '../../utils/toast.js';
 
 export default function OrderPendingPage() {
   const { boothId, orderId } = useParams();
