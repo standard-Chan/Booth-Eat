@@ -6,11 +6,11 @@ export default function OrderCard({
   tableNo,
   timeText = "",
   active = false,
-  orderStatus = null, // 'PENDING' | 'APPROVED' | null
+  orderStatus = null, // 'PENDING' | 'APPROVED' | 'REJECTED' | 'FINISHED' | null
   items = [], // [{ name, qty }]
   customerName = "",
-  addAmount = 0, // 최신 주문 금액
-  totalAmount = 0, // 방문 전체 합계
+  addAmount = 0,
+  totalAmount = 0,
   onApprove,
   onReject,
   onClear,
@@ -18,8 +18,9 @@ export default function OrderCard({
 }) {
   const isPending = active && orderStatus === "PENDING";
   const isApproved = active && orderStatus === "APPROVED";
+  const isRejected = active && orderStatus === "REJECTED";
+  const isFinished = active && orderStatus === "FINISHED";
 
-  // 체크는 사용자 인터랙션으로 관리 (초기엔 전부 해제)
   const [checks, setChecks] = useState({});
   useEffect(() => {
     const init = {};
@@ -46,7 +47,6 @@ export default function OrderCard({
         </EmptyWrap>
       ) : (
         <>
-          {/* 아이템 리스트 */}
           <ItemList>
             {items.map((it, i) => (
               <ItemRow key={`${it.name}-${i}`} onClick={() => toggleCheck(i)}>
@@ -57,7 +57,6 @@ export default function OrderCard({
             ))}
           </ItemList>
 
-          {/* 메타 정보 */}
           <Meta>
             <MetaRow>
               <MetaKey>주문자</MetaKey>
@@ -79,7 +78,6 @@ export default function OrderCard({
             </MetaRow>
           </Meta>
 
-          {/* 액션 */}
           <Actions>
             {isPending && (
               <>
@@ -88,12 +86,15 @@ export default function OrderCard({
               </>
             )}
             {isApproved && <GhostBtn onClick={onClear}>비우기</GhostBtn>}
+            {isRejected && <GhostBtn disabled>거절됨</GhostBtn>}
+            {isFinished && <GhostBtn disabled>완료</GhostBtn>}
           </Actions>
         </>
       )}
     </Card>
   );
 }
+
 
 /* ===== styles ===== */
 const Card = styled.article`

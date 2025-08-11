@@ -41,7 +41,7 @@ const MOCK_ORDERS = [
   },
   {
     customerOrder: {
-      order_id: 202, table_id: 2, visit_id: 20, status: "APPROVED",
+      order_id: 202, table_id: 2, visit_id: 20, status: "FINISHED",
       order_code: "B202", total_amount: 18900, created_at: "2025-08-11T18:16:00+09:00",
     },
     orderItems: [
@@ -239,4 +239,17 @@ export async function loadCards(boothId) {
   }
 
   return results;
+}
+
+export async function fetchOrderHistoryByTable(boothId, tableNumber) {
+  // 실제 API 예시: GET /manager/booths/:boothId/tables/:tableNumber/orders/history
+  const tables = await fetchTables(boothId);
+  const table = tables.find(t => t.tableNumber === Number(tableNumber));
+  if (!table) return delay([]);
+
+  const list = MOCK_ORDERS
+    .filter(o => o.customerOrder.table_id === table.tableId)
+    .sort((a,b) => +new Date(b.customerOrder.created_at) - +new Date(a.customerOrder.created_at));
+
+  return delay(list);
 }

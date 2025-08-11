@@ -1,10 +1,10 @@
-// src/pages/manager/MenusPage.jsx
+// src/pages/manager/MenusPage.jsx  (= ManagerOrdersPage)
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import AppLayout from "../../components/common/manager/AppLayout.jsx";
 import OrderCard from "../../components/manager/OrderCard.jsx";
-import Modal from "../../components/common/manager/Modal.jsx";
+import OrderHistoryModal from "../../components/manager/OrderHistoryModal.jsx"; 
 import { loadCards } from "../../services/ordersService.js";
 
 const Grid = styled.div`
@@ -16,7 +16,7 @@ const Grid = styled.div`
 export default function ManagerOrdersPage() {
   const { boothId } = useParams();
   const [cards, setCards] = useState([]);
-  const [receiptFor, setReceiptFor] = useState(null);
+  const [popup, setPopup] = useState(null); // { tableNumber } | null
 
   useEffect(() => {
     let mounted = true;
@@ -44,18 +44,23 @@ export default function ManagerOrdersPage() {
             onApprove={() => console.log(`approve visit ${c.visitId} (table ${c.tableNumber})`)}
             onReject={() => console.log(`reject visit ${c.visitId} (table ${c.tableNumber})`)}
             onClear={() => console.log(`clear visit ${c.visitId} (table ${c.tableNumber})`)}
-            onReceiptClick={() => setReceiptFor(c.tableNumber)}
+            onReceiptClick={() => setPopup({ tableNumber: c.tableNumber })}
           />
         ))}
       </Grid>
 
-      <Modal
-        open={!!receiptFor}
-        title={`테이블 ${receiptFor} 주문 내역 (임시)`}
-        onClose={() => setReceiptFor(null)}
-      >
-        나중에 실제 내역을 리스트업 할 영역입니다.
-      </Modal>
+      {/* ✅ 주문 내역 팝업 */}
+      <OrderHistoryModal
+        open={!!popup}
+        boothId={boothId ?? 1}
+        tableNumber={popup?.tableNumber}
+        onClose={() => setPopup(null)}
+        onClearTable={(visitId) => {
+          // TODO: 실제 "테이블 비우기(visit 완료처리)" API 호출
+          console.log("테이블 비우기 visitId:", visitId);
+          setPopup(null);
+        }}
+      />
     </AppLayout>
   );
 }
