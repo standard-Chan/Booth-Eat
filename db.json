@@ -124,6 +124,13 @@
       "boothId": 1,
       "tableNumber": 8,
       "active": true
+    },
+    {
+      "id": 9,
+      "tableId": 9,
+      "boothId": 1,
+      "tableNumber": 9,
+      "active": true
     }
   ],
   "visits": [

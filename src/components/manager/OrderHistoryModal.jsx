@@ -1,16 +1,18 @@
-// src/components/manager/OrderHistoryModal.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import Modal from "../common/manager/Modal.jsx";
 import OrderCard from "./OrderCard.jsx";
-import { fetchOrderHistoryByTable } from "../../services/ordersService.js";
+
+import { getTableOrders, setOrderStatus } from "../../api/manager/orderApi.js";
+
+
 
 export default function OrderHistoryModal({
   open,
   boothId,
+  tableId,
   tableNumber,
   onClose,
-  onClearOrder, // (orderId) => void
 }) {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -20,39 +22,40 @@ export default function OrderHistoryModal({
   const colRefs = useRef([]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !boothId || !tableId) return;
     setLoading(true);
     setError(null);
     (async () => {
       try {
-        const data = await fetchOrderHistoryByTable(boothId, tableNumber);
+        const data = await getTableOrders(boothId, tableId);
         setOrders(data || []);
       } catch (e) {
-        setError("주문 내역을 불러오지 못했습니다.");
+        setError("주문 이력을 불러오지 못했습니다.");
       } finally {
         setLoading(false);
       }
     })();
-  }, [open, boothId, tableNumber]);
+  }, [open, boothId, tableId]);
 
-  // 최신순 정렬 보장
   const sorted = useMemo(
     () =>
       [...orders].sort(
         (a, b) =>
-          +new Date(b.customerOrder?.created_at) -
-          +new Date(a.customerOrder?.created_at)
+          +new Date(b?.customerOrder?.created_at || 0) -
+          +new Date(a?.customerOrder?.created_at || 0)
       ),
     [orders]
   );
 
   const fmtHM = (iso) => {
+    if (!iso) return "";
     const d = new Date(iso);
     return `${String(d.getHours()).padStart(2, "0")}:${String(
       d.getMinutes()
     ).padStart(2, "0")}`;
   };
   const fmtYMD = (iso) => {
+    if (!iso) return "";
     const d = new Date(iso);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(
       2,
@@ -60,28 +63,37 @@ export default function OrderHistoryModal({
     )}.${String(d.getDate()).padStart(2, "0")}`;
   };
 
-  // Order → OrderCard props 매핑
+  const handleFinishOne = async (orderId) => {
+    try {
+      await setOrderStatus(orderId, "FINISHED");
+      const data = await getTableOrders(boothId, tableId);
+      setOrders(data || []);
+    } catch (e) {
+      alert("주문 완료 처리에 실패했습니다.");
+    }
+  };
+
   const toCardProps = (o) => {
-    const co = o.customerOrder || {};
-    const status = (co.status || "").toUpperCase(); // PENDING | APPROVED | DONE
-    const amount = o.paymentInfo?.amount ?? co.total_amount ?? 0;
+    const co = o?.customerOrder || {};
+    const status = (co.status || "").toUpperCase();
+    const amount = o?.paymentInfo?.amount ?? co?.total_amount ?? 0;
 
     return {
       tableNo: tableNumber,
       timeText: `${fmtYMD(co.created_at)} ${fmtHM(co.created_at)}`,
       active: true,
-      orderStatus: status === "DONE" ? "APPROVED" : status, // 카드 조건(비우기 버튼) 재사용 위해 DONE→APPROVED 취급
-      items: (o.orderItems || []).map((it) => ({
+      orderStatus: status, // PENDING | APPROVED | REJECTED | FINISHED
+      items: (o?.orderItems || []).map((it) => ({
         name: it.name,
-        qty: it.quantity,
+        qty: it.quantity ?? it.qty ?? 0,
       })),
-      customerName: o.paymentInfo?.payer_name || "-",
-      addAmount: amount, // 히스토리 카드에선 개별 주문 금액
-      totalAmount: amount, // 기존 컴포넌트 구조 유지 위해 동일 값 전달
-      onApprove: undefined, // 팝업에선 사용 안 함
+      customerName: o?.paymentInfo?.payer_name || "-",
+      addAmount: amount,
+      totalAmount: amount,
+      onApprove: undefined,
       onReject: undefined,
-      onClear: () => onClearOrder?.(co.order_id),
-      onReceiptClick: () => {}, // 팝업 안의 아이콘은 동작 없음
+      onClear: () => handleFinishOne(co.order_id), // 이 주문만 FINISHED
+      onReceiptClick: () => {},
     };
   };
 
@@ -94,18 +106,16 @@ export default function OrderHistoryModal({
       )}
 
       {!loading && !error && sorted.length > 0 && (
-        <>
-          <List ref={listRef}>
-            {sorted.map((o, i) => (
-              <CardWrap
-                key={o.customerOrder?.order_id}
-                ref={(el) => (colRefs.current[i] = el)}
-              >
-                <OrderCard {...toCardProps(o)} />
-              </CardWrap>
-            ))}
-          </List>
-        </>
+        <List ref={listRef}>
+          {sorted.map((o, i) => (
+            <CardWrap
+              key={o?.customerOrder?.order_id || `${i}`}
+              ref={(el) => (colRefs.current[i] = el)}
+            >
+              <OrderCard {...toCardProps(o)} />
+            </CardWrap>
+          ))}
+        </List>
       )}
     </Modal>
   );
@@ -122,12 +132,10 @@ const Empty = styled.div`
 const List = styled.div`
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 340px; /* 카드 폭 + 여유 */
+  grid-auto-columns: 340px;
   gap: 18px;
   overflow-x: auto;
   padding: 8px 6px 6px 6px;
 `;
 
-const CardWrap = styled.div`
-  /* 팝업 안에서 카드 여백/그림자 조정하고 싶으면 여기서 */
-`;
+const CardWrap = styled.div``;
