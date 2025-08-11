@@ -4,8 +4,12 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import AppLayout from "../../components/common/manager/AppLayout.jsx";
 import OrderCard from "../../components/manager/OrderCard.jsx";
-import OrderHistoryModal from "../../components/manager/OrderHistoryModal.jsx"; 
-import { loadCards } from "../../services/ordersService.js";
+import OrderHistoryModal from "../../components/manager/OrderHistoryModal.jsx";
+import {
+  clearTable,
+  loadCards,
+  updateOrderStatus,
+} from "../../services/ordersService.js";
 
 const Grid = styled.div`
   display: grid;
@@ -24,7 +28,9 @@ export default function ManagerOrdersPage() {
       const data = await loadCards(boothId ?? 1);
       if (mounted) setCards(data);
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [boothId]);
 
   return (
@@ -41,9 +47,16 @@ export default function ManagerOrdersPage() {
             customerName={c.customerName}
             addAmount={c.addAmount || 0}
             totalAmount={c.totalAmount || 0}
-            onApprove={() => console.log(`approve visit ${c.visitId} (table ${c.tableNumber})`)}
-            onReject={() => console.log(`reject visit ${c.visitId} (table ${c.tableNumber})`)}
-            onClear={() => console.log(`clear visit ${c.visitId} (table ${c.tableNumber})`)}
+            onApprove={async () => {
+              console.log(c);
+              await updateOrderStatus(c.latestOrderId, "APPROVED");
+            }}
+            onReject={async () => {
+              await updateOrderStatus(c.latestOrderId, "REJECTED");
+            }}
+            onClear={async () => {
+              await clearTable(c.tableId);
+            }}
             onReceiptClick={() => setPopup({ tableNumber: c.tableNumber })}
           />
         ))}

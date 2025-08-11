@@ -1,14 +1,60 @@
 {
   "booths": [
+    { "id": 1, "name": "핫도그부스" },
+    { "id": 2, "name": "분식부스" }
+  ],
+
+  "menus": [
     {
       "id": 1,
-      "name": "1번 부스"
+      "menuItemId": 1,
+      "boothId": 1,
+      "name": "핫도그",
+      "price": 4000,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": null,
+      "category": "FOOD"
     },
     {
       "id": 2,
-      "name": "2번 부스"
+      "menuItemId": 2,
+      "boothId": 1,
+      "name": "치즈핫도그",
+      "price": 5000,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": null,
+      "category": "FOOD"
+    },
+    {
+      "id": 3,
+      "menuItemId": 3,
+      "boothId": 1,
+      "name": "콜라",
+      "price": 2000,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": null,
+      "category": "FOOD"
+    },
+    {
+      "id": 4,
+      "menuItemId": 4,
+      "boothId": 1,
+      "name": "테스트핫도그-53873",
+      "price": 4500,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "테스트 메뉴",
+      "category": "FOOD"
     }
   ],
+
   "accounts": [
     {
       "id": 1,
@@ -16,348 +62,173 @@
       "bank": "카카오뱅크",
       "account": "123-****-****",
       "accountHolder": "정석찬"
-    },
-    {
-      "id": 2,
-      "boothId": 2,
-      "bank": "토스뱅크",
-      "account": "456-****-****",
-      "accountHolder": "모드니"
     }
   ],
-  "menuItems": [
+
+  "tables": [
+    { "id": 1, "tableId": 1, "boothId": 1, "tableNumber": 1, "active": true },
+    { "id": 2, "tableId": 2, "boothId": 1, "tableNumber": 2, "active": true },
+    { "id": 3, "tableId": 3, "boothId": 1, "tableNumber": 3, "active": false },
+    { "id": 4, "tableId": 4, "boothId": 1, "tableNumber": 4, "active": true },
+    { "id": 5, "tableId": 5, "boothId": 1, "tableNumber": 5, "active": true },
+    { "id": 6, "tableId": 6, "boothId": 1, "tableNumber": 6, "active": true },
+    { "id": 7, "tableId": 7, "boothId": 1, "tableNumber": 7, "active": true },
+    { "id": 8, "tableId": 8, "boothId": 1, "tableNumber": 8, "active": true }
+  ],
+
+  "visits": [
     {
-      "id": 1,
-      "menuItemId": 1,
-      "boothId": 1,
-      "name": "치즈버거",
-      "description": "고소한 치즈와 두툼한 패티",
-      "price": 5000,
-      "category": "FOOD",
-      "previewImage": "/images/sample1.jpg",
-      "available": true,
-      "isAvailable": true
+      "id": 10,
+      "visitId": 10,
+      "tableId": 1,
+      "visitNo": 3,
+      "status": "OPEN",
+      "startedAt": "2025-08-11T01:00:00Z",
+      "closedAt": null
     },
     {
-      "id": 2,
-      "menuItemId": 2,
-      "boothId": 1,
-      "name": "오징어 튀김",
-      "description": "오징어",
-      "price": 7000,
-      "category": "FOOD",
-      "previewImage": "/images/sample2.jpg",
-      "available": true,
-      "isAvailable": true
-    },
-    {
-      "id": 3,
-      "menuItemId": 3,
-      "boothId": 1,
-      "name": "김치볶음밥",
-      "description": "불맛 살짝",
-      "price": 6000,
-      "category": "FOOD",
-      "previewImage": "/images/sample3.jpg",
-      "available": true,
-      "isAvailable": true
-    },
-    {
-      "id": 4,
-      "menuItemId": 4,
-      "boothId": 1,
-      "name": "오뎅탕",
-      "description": "국물 진함",
-      "price": 4000,
-      "category": "FOOD",
-      "previewImage": "/images/sample4.jpg",
-      "available": false,
-      "isAvailable": false
-    },
-    {
-      "boothId": "1",
-      "name": "@@@@@@@@@@@@@버거",
-      "price": 10000000,
-      "description": "골뱅이무침버거",
-      "category": "FOOD",
-      "previewImage": "/images/sample1.jpg",
-      "available": false,
-      "id": 5
+      "id": 11,
+      "visitId": 11,
+      "tableId": 4,
+      "visitNo": 1,
+      "status": "OPEN",
+      "startedAt": "2025-08-11T02:10:00Z",
+      "closedAt": null
     }
   ],
-  "menuTotals": [
-    {
-      "id": 1,
-      "menuItemId": 1,
-      "totalOrderQuantity": 21
-    },
-    {
-      "id": 2,
-      "menuItemId": 2,
-      "totalOrderQuantity": 26
-    },
-    {
-      "id": 3,
-      "menuItemId": 3,
-      "totalOrderQuantity": 21
-    },
-    {
-      "id": 4,
-      "menuItemId": 4,
-      "totalOrderQuantity": 15
-    }
-  ],
+
   "orders": [
     {
       "id": 123,
-      "boothId": 1,
-      "tableNo": 7,
-      "status": "PENDING",
-      "amount": 43000,
-      "createdAt": "2025-08-09T11:30:00Z",
-      "items": [
-        {
-          "foodId": 2,
-          "name": "오징어튀김",
-          "price": 7000,
-          "imageUrl": "/images/sample2.jpg",
-          "quantity": 2
-        },
-        {
-          "foodId": 1,
-          "name": "치즈버거",
-          "price": 5000,
-          "imageUrl": "/images/sample1.jpg",
-          "quantity": 3
-        }
-      ],
-      "payment": {
-        "payerName": "정석찬",
-        "amount": 43000
-      }
-    },
-    {
-      "id": 124,
-      "boothId": 1,
-      "tableNo": 7,
-      "status": "APPROVED",
-      "amount": 15000,
-      "createdAt": "2025-08-09T11:40:00Z",
-      "items": [
-        {
-          "foodId": 1,
-          "name": "치즈버거",
-          "price": 5000,
-          "imageUrl": "/images/sample1.jpg",
-          "quantity": 3
-        }
-      ],
-      "payment": {
-        "payerName": "홍길동",
-        "amount": 15000
-      }
-    }
-  ],
-  "tables": [
-    {
-      "id": 1,
-      "tableId": 1,
-      "boothId": 1,
-      "tableNumber": 1,
-      "active": true
-    },
-    {
-      "id": 2,
-      "tableId": 2,
-      "boothId": 1,
-      "tableNumber": 2,
-      "active": true
-    },
-    {
-      "id": 3,
-      "tableId": 3,
-      "boothId": 1,
-      "tableNumber": 3,
-      "active": false
-    },
-    {
-      "id": 4,
-      "tableId": 4,
-      "boothId": 1,
-      "tableNumber": 7,
-      "active": true
-    }
-  ],
-  "latestOrders": [
-    {
-      "id": 1,
-      "tableId": 4,
-      "orderIds": [
-        123,
-        124
-      ]
-    },
-    {
-      "id": 2,
-      "tableId": 2,
-      "orderIds": []
-    }
-  ],
-  "orderDetails": [
-    {
-      "id": 123,
       "orderId": 123,
-      "customerOrder": {
-        "order_id": 123,
-        "table_id": 4,
-        "visit_id": 999,
-        "status": "PENDING",
-        "order_code": "ORD-123",
-        "total_amount": 43000,
-        "created_at": "2025-08-09T11:30:00Z",
-        "approved_at": null
-      },
-      "orderItems": [
-        {
-          "name": "오징어튀김",
-          "quantity": 2
-        },
-        {
-          "name": "치즈버거",
-          "quantity": 3
-        }
+      "boothId": 1,
+      "tableId": 7,
+      "visitId": 10,
+      "status": "PENDING",
+      "orderCode": "BE-20250811-000123",
+      "totalAmount": 43000,
+      "createdAt": "2025-08-09T11:30:00Z",
+      "approvedAt": null,
+      "tableNo": 7,
+      "items": [
+        { "foodId": 11, "name": "오징어튀김", "price": 7000, "imageUrl": "/images/sample2.jpg", "quantity": 2 },
+        { "foodId": 1, "name": "치즈버거", "price": 5000, "imageUrl": "/images/sample1.jpg", "quantity": 3 }
       ],
-      "paymentInfo": {
-        "payer_name": "정석찬",
-        "amount": 43000
-      }
+      "payment": { "payerName": "정석찬", "amount": 43000 }
     },
     {
       "id": 124,
       "orderId": 124,
-      "customerOrder": {
-        "order_id": 124,
-        "table_id": 4,
-        "visit_id": 999,
-        "status": "APPROVED",
-        "order_code": "ORD-124",
-        "total_amount": 15000,
-        "created_at": "2025-08-09T11:40:00Z",
-        "approved_at": "2025-08-09T11:42:00Z"
-      },
-      "orderItems": [
-        {
-          "name": "치즈버거",
-          "quantity": 3
-        }
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "APPROVED",
+      "orderCode": "BE-20250811-000124",
+      "totalAmount": 10000,
+      "createdAt": "2025-08-11T01:23:45Z",
+      "approvedAt": "2025-08-11T01:25:00Z",
+      "tableNo": 1,
+      "items": [
+        { "foodId": 1, "name": "핫도그", "price": 4000, "imageUrl": null, "quantity": 2 },
+        { "foodId": 3, "name": "콜라", "price": 2000, "imageUrl": null, "quantity": 1 }
       ],
-      "paymentInfo": {
-        "payer_name": "홍길동",
-        "amount": 15000
-      }
+      "payment": { "payerName": "홍길동", "amount": 10000 }
+    },
+    {
+      "id": 125,
+      "orderId": 125,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "FINISHED",
+      "orderCode": "BE-20250811-000125",
+      "totalAmount": 15000,
+      "createdAt": "2025-08-11T01:40:00Z",
+      "approvedAt": "2025-08-11T01:41:00Z",
+      "tableNo": 1,
+      "items": [
+        { "foodId": 2, "name": "치즈핫도그", "price": 5000, "imageUrl": null, "quantity": 3 }
+      ],
+      "payment": { "payerName": "김철수", "amount": 15000 }
     }
   ],
-  "ordersByTable": [
+
+  "menuMetrics": [
+    { "id": 1, "boothId": 1, "menuItemId": 3, "totalOrderQuantity": 48 }
+  ],
+
+  "todayStats": [
     {
       "id": 1,
       "boothId": 1,
-      "tableId": 4,
-      "orders": [
+      "date": "2025-08-11",
+      "totalOrders": 7,
+      "totalAmount": 54000,
+      "peakHour": 14,
+      "topItems": [
+        { "menuItemId": 1, "name": "핫도그", "qty": 8, "amount": 32000 },
+        { "menuItemId": 3, "name": "콜라", "qty": 5, "amount": 10000 }
+      ]
+    }
+  ],
+
+  "menuRankings": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "date": "2025-08-11",
+      "metric": "qty",
+      "items": [
+        { "menuItemId": 1, "name": "핫도그", "qty": 8, "amount": 32000 },
+        { "menuItemId": 3, "name": "콜라", "qty": 5, "amount": 10000 }
+      ]
+    }
+  ],
+
+  "devTableContexts": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "tableNo": 1,
+      "currentVisit": {
+        "visitId": 10,
+        "visitNo": 3,
+        "status": "OPEN",
+        "startedAt": "2025-08-11T01:00:00Z",
+        "closedAt": null
+      },
+      "recentOrders": [
         {
-          "customerOrder": {
-            "order_id": 123,
-            "table_id": 4,
-            "visit_id": 999,
-            "status": "PENDING",
-            "order_code": "ORD-123",
-            "total_amount": 43000,
-            "created_at": "2025-08-09T11:30:00Z",
-            "approved_at": null
-          },
-          "orderItems": [
-            {
-              "name": "오징어튀김",
-              "quantity": 2
-            },
-            {
-              "name": "치즈버거",
-              "quantity": 3
-            }
-          ],
-          "paymentInfo": {
-            "payer_name": "정석찬",
-            "amount": 43000
-          }
-        },
-        {
-          "customerOrder": {
-            "order_id": 124,
-            "table_id": 4,
-            "visit_id": 999,
-            "status": "APPROVED",
-            "order_code": "ORD-124",
-            "total_amount": 15000,
-            "created_at": "2025-08-09T11:40:00Z",
-            "approved_at": "2025-08-09T11:42:00Z"
-          },
-          "orderItems": [
-            {
-              "name": "치즈버거",
-              "quantity": 3
-            }
-          ],
-          "paymentInfo": {
-            "payer_name": "홍길동",
-            "amount": 15000
-          }
+          "orderId": 123,
+          "orderCode": "BE-20250811-000123",
+          "status": "APPROVED",
+          "totalAmount": 10000,
+          "createdAt": "2025-08-11T01:23:45Z",
+          "approvedAt": "2025-08-11T01:25:00Z",
+          "visitId": 10
         }
       ]
     }
   ],
-  "salesDaily": [
+
+  "dateSales": [
     {
       "id": 1,
       "boothId": 1,
-      "date": "2025-08-09",
+      "date": "2025-08-11",
       "totalSales": 720000,
       "orderNumbers": 44
-    },
-    {
-      "id": 2,
-      "boothId": 1,
-      "date": "2025-08-10",
-      "totalSales": 380000,
-      "orderNumbers": 20
     }
   ],
+
   "menuSales": [
     {
       "id": 1,
       "boothId": 1,
-      "menuItemId": 1,
-      "name": "치즈버거",
-      "totalSales": 150000
-    },
-    {
-      "id": 2,
-      "boothId": 1,
-      "menuItemId": 2,
-      "name": "오징어 튀김",
-      "totalSales": 210000
-    },
-    {
-      "id": 3,
-      "boothId": 1,
-      "menuItemId": 3,
-      "name": "김치볶음밥",
-      "totalSales": 180000
-    },
-    {
-      "id": 4,
-      "boothId": 1,
-      "menuItemId": 4,
-      "name": "오뎅탕",
-      "totalSales": 120000
+      "items": [
+        { "menuItemId": 3, "name": "오징어 튀김", "totalSales": 150000 },
+        { "menuItemId": 5, "name": "김치볶음밥", "totalSales": 230000 }
+      ]
     }
   ]
 }

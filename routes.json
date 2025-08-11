@@ -1,20 +1,15 @@
 {
-  "/api/booths/:boothId/menuItems": "/menuItems?boothId=:boothId",
-  "/api/booths/:boothId/menuItems/:menuItemId": "/menuItems/:menuItemId",
-  "/api/booths/:boothId/account": "/accounts?boothId=:boothId",
-
-  "/api/menus": "/menuItems",
-  "/api/menus/:menuId": "/menuItems/:menuId",
-  "/api/menus/:menuId/total-orders": "/menuTotals?menuItemId=:menuId",
-  "/api/menus/:menuId/available": "/menuItems/:menuId",
+  "/api/booths/menus/:boothId": "/booths/:boothId/menus",
+  "/api/booth/menus/:boothId/:menuItemId": "/booths/:boothId/menus/:menuItemId",
+  "/api/booths/:boothId/account": "/booths/:boothId/account",
 
   "/api/orders": "/orders",
   "/api/orders/:orderId": "/orders/:orderId",
-  "/api/orders/:orderId/detail": "/orderDetails?orderId=:orderId",
 
-  "/api/tables": "/tables",
-  "/api/tables/:tableId/latest-orders": "/latestOrders?tableId=:tableId",
+  "/api/dev/table-context": "/tableContext",
+  "/api/tables/:tableId/visits/latest/orders": "/visits/:tableId/latest",
+  "/api/booths/:boothId/tables/:tableId/orders": "/boothTableOrders/:boothId/:tableId/orders",
 
-  "/api/sales": "/salesDaily",
-  "/api/sales/menu": "/menuSales"
+  "/api/manager/stats/today": "/stats/today",
+  "/api/manager/rankings/menu": "/stats/menuRanking"
 }

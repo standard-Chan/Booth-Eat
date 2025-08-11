@@ -1,120 +1,29 @@
 // src/services/manager/ordersMockService.js
-// ⚠️ 실제 API 붙일 땐 아래 MOCK_* 을 제거하고 fetch/axios로 대체하면 됨.
+// ✅ 실제 API 경로 사용 (json-server + 실제 서버 겸용)
+//    - 경로/쿼리는 src/const/api.js 의 BASE_URL, API_ORDER 사용
+//    - json-server일 때 배열([]) 응답은 1개 객체로 정규화 처리
 
-// ---------------- MOCK DATA ----------------
-const MOCK_TABLES = [
-  { tableId: 1, tableNumber: 1, active: true },
-  { tableId: 2, tableNumber: 2, active: true },
-  { tableId: 3, tableNumber: 3, active: false },
-  { tableId: 4, tableNumber: 4, active: true },
-  { tableId: 5, tableNumber: 5, active: true },
-  { tableId: 6, tableNumber: 6, active: true },
-  { tableId: 7, tableNumber: 7, active: true },
-  { tableId: 8, tableNumber: 8, active: true },
-];
+import { API_ORDER, BASE_URL } from "../api/api.js";
 
-const MOCK_ORDERS = [
-  // table 1, visit 10 (PENDING)
-  {
-    customerOrder: {
-      order_id: 101, table_id: 1, visit_id: 10, status: "PENDING",
-      order_code: "A101", total_amount: 18900, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "오징어튀김", quantity: 1 },
-      { name: "닭발", quantity: 1 },
-      { name: "사이다", quantity: 1 },
-    ],
-    paymentInfo: { payer_name: "이시현", amount: 18900 },
-  },
-  // table 2, visit 20 (APPROVED) + 추가주문
-  {
-    customerOrder: {
-      order_id: 201, table_id: 2, visit_id: 20, status: "APPROVED",
-      order_code: "B201", total_amount: 14000, created_at: "2025-08-11T18:05:00+09:00",
-    },
-    orderItems: [
-      { name: "김치볶음밥", quantity: 1 },
-      { name: "떡볶이", quantity: 1 },
-    ],
-    paymentInfo: { payer_name: "홍길동", amount: 14000 },
-  },
-  {
-    customerOrder: {
-      order_id: 202, table_id: 2, visit_id: 20, status: "FINISHED",
-      order_code: "B202", total_amount: 18900, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "닭발", quantity: 1 },
-      { name: "오징어튀김", quantity: 1 },
-      { name: "사이다", quantity: 1 },
-    ],
-    paymentInfo: { payer_name: "홍길동", amount: 18900 },
-  },
-  // table 4, visit 40 (PENDING)
-  {
-    customerOrder: {
-      order_id: 401, table_id: 4, visit_id: 40, status: "PENDING",
-      order_code: "D401", total_amount: 18900, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "김치볶음밥", quantity: 1 },
-      { name: "오징어튀김", quantity: 1 },
-    ],
-    paymentInfo: { payer_name: "도경수", amount: 18900 },
-  },
-  // table 5, visit 50 (APPROVED)
-  {
-    customerOrder: {
-      order_id: 501, table_id: 5, visit_id: 50, status: "APPROVED",
-      order_code: "E501", total_amount: 14200, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "김치볶음밥", quantity: 1 },
-      { name: "오징어튀김", quantity: 1 },
-    ],
-    paymentInfo: { payer_name: "최준근", amount: 14200 },
-  },
-  // table 6, visit 60 (PENDING)
-  {
-    customerOrder: {
-      order_id: 601, table_id: 6, visit_id: 60, status: "PENDING",
-      order_code: "F601", total_amount: 12900, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "김치볶음밥", quantity: 1 },
-      { name: "사이다", quantity: 2 },
-    ],
-    paymentInfo: { payer_name: "김태희", amount: 12900 },
-  },
-  // table 7, visit 70 (PENDING)
-  {
-    customerOrder: {
-      order_id: 701, table_id: 7, visit_id: 70, status: "PENDING",
-      order_code: "G701", total_amount: 18900, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "김치볶음밥", quantity: 1 },
-      { name: "오징어튀김", quantity: 3 },
-    ],
-    paymentInfo: { payer_name: "이수지", amount: 18900 },
-  },
-  // table 8, visit 80 (PENDING)
-  {
-    customerOrder: {
-      order_id: 801, table_id: 8, visit_id: 80, status: "PENDING",
-      order_code: "H801", total_amount: 18900, created_at: "2025-08-11T18:16:00+09:00",
-    },
-    orderItems: [
-      { name: "김치볶음밥", quantity: 1 },
-      { name: "오징어튀김", quantity: 3 },
-    ],
-    paymentInfo: { payer_name: "박보검", amount: 18900 },
-  },
-];
 
-// ---------------- helpers ----------------
-const delay = (v, ms = 50) => new Promise(res => setTimeout(() => res(v), ms));
+const MOCK = true; // 더미 지연이 필요하면 true
+const delay = (v, ms = 60) => (MOCK ? new Promise(res => setTimeout(() => res(v), ms)) : v);
+
+// 공통 fetch 래퍼
+async function req(path, opts = {}) {
+  const url = `${BASE_URL}${path}`;
+  const res = await fetch(url, {
+    credentials: "include",
+    ...opts,
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`[${res.status}] ${url} ${t}`);
+  }
+  return res;
+}
+
+// HH:MM 포맷
 const hhmm = (iso) => {
   const d = new Date(iso);
   const h = String(d.getHours()).padStart(2, "0");
@@ -122,31 +31,47 @@ const hhmm = (iso) => {
   return `${h}:${m}`;
 };
 
-// ---------------- STEP 1: boothId → tables ----------------
+/* ---------------- STEP 1: boothId → tables ---------------- */
+/** 부스의 테이블 목록 조회 */
 export async function fetchTables(boothId) {
-  // TODO: 실제 API 예시 → GET /manager/booths/:boothId/tables
-  return delay(MOCK_TABLES);
+  // GET /api/tables?boothId=...
+  const res = await req(API_ORDER.GET_TABLES_BY_BOOTH(boothId));
+  const rows = await res.json();
+  // db.json(tables): { id, tableId, boothId, tableNumber, active }
+  const normalized = rows.map((t) => ({
+    tableId: t.tableId ?? t.id,
+    tableNumber: t.tableNumber,
+    active: Boolean(t.active),
+  }));
+  return delay(normalized);
 }
 
-// ---------------- STEP 3: tableId → { orderIds } ----------
+/* ---------------- STEP 3: tableId → { orderIds } ---------- */
+/** 테이블의 최신 방문에 해당하는 주문 ID 목록 */
 export async function fetchOrderIdsByTable(tableId) {
-  // TODO: 실제 API 예시 → GET /manager/tables/:tableId/orders/ids
-  const orderIds = MOCK_ORDERS
-    .filter((o) => o.customerOrder.table_id === tableId)
-    .map((o) => o.customerOrder.order_id);
-  return delay({ orderIds });
+  // GET /api/tables/:tableId/latest-orders → routes: /latestOrders?tableId=:
+  const res = await req(API_ORDER.GET_ORDER_IDS_BY_TABLE(tableId));
+  const data = await res.json();
+  const one = Array.isArray(data) ? (data[0] ?? { orderIds: [] }) : data;
+  return delay({ orderIds: one.orderIds ?? [] });
 }
 
-// ---------------- STEP 4: orderIds → details --------------
+/* ---------------- STEP 4: orderIds → details -------------- */
+/** 주문 상세(여러 개) 조회 */
 export async function fetchOrderDetails(orderIds) {
-  // TODO: 실제 API 예시 → GET /manager/orders?ids=1,2,3
-  const details = MOCK_ORDERS.filter((o) =>
-    orderIds.includes(o.customerOrder.order_id)
-  );
+  if (!orderIds || orderIds.length === 0) return [];
+  // /api/orders/:id/detail → routes: /orderDetails?orderId=:
+  const promises = orderIds.map(async (id) => {
+    const res = await req(API_ORDER.GET_ORDER_DETAIL(id));
+    const data = await res.json();
+    const one = Array.isArray(data) ? (data[0] ?? null) : data;
+    return one;
+  });
+  const details = (await Promise.all(promises)).filter(Boolean);
   return delay(details);
 }
 
-// ---------------- group & summarize -----------------------
+/* ---------------- group & summarize ----------------------- */
 export function groupOrdersByVisit(orders) {
   const map = new Map(); // visit_id -> order[]
   for (const o of orders) {
@@ -163,8 +88,7 @@ export function summarizeVisitGroup(group) {
 
   const latest = [...group].sort(
     (a, b) =>
-      +new Date(b.customerOrder.created_at) -
-      +new Date(a.customerOrder.created_at)
+      +new Date(b.customerOrder.created_at) - +new Date(a.customerOrder.created_at)
   )[0];
 
   const timeText = hhmm(latest.customerOrder.created_at);
@@ -172,8 +96,7 @@ export function summarizeVisitGroup(group) {
   const addAmount =
     latest.paymentInfo?.amount ?? latest.customerOrder.total_amount ?? 0;
   const totalAmount = group.reduce(
-    (sum, x) =>
-      sum + (x.paymentInfo?.amount ?? x.customerOrder.total_amount ?? 0),
+    (sum, x) => sum + (x.paymentInfo?.amount ?? x.customerOrder.total_amount ?? 0),
     0
   );
 
@@ -196,60 +119,167 @@ export function summarizeVisitGroup(group) {
   };
 }
 
-// ---------------- Orchestrator: booth → cards -------------
+/* ---------------- Orchestrator: booth → cards ------------- */
+/** 부스 → 카드 목록 로딩 */
 export async function loadCards(boothId) {
   const tables = await fetchTables(boothId);
   const results = [];
 
+  // table 구조
+  // [
+  //   {
+  //       "tableId": 1,
+  //       "tableNumber": 1,
+  //       "active": true
+  //   },...]
+
   for (const t of tables) {
-    if (!t.active) {
+    if (!t.active) { // 활성화 상태 아닌 경우 pass
       results.push({ tableId: t.tableId, tableNumber: t.tableNumber, active: false });
       continue;
     }
 
     const { orderIds } = await fetchOrderIdsByTable(t.tableId);
-    const orders = await fetchOrderDetails(orderIds);
-    const groups = groupOrdersByVisit(orders);
-
-    if (groups.size === 0) {
+    console.log(orderIds);
+    if (!orderIds || orderIds.length === 0) {
       results.push({
-        tableId: t.tableId, tableNumber: t.tableNumber, active: true,
-        orderStatus: "PENDING", items: [], customerName: "",
-        addAmount: 0, totalAmount: 0, timeText: "", visitId: null,
+        tableId: t.tableId,
+        tableNumber: t.tableNumber,
+        active: true,
+        orderStatus: "PENDING",
+        items: [],
+        customerName: "",
+        addAmount: 0,
+        totalAmount: 0,
+        timeText: "",
+        visitId: null,
+        latestOrderId: null, // ✅ 추가
       });
       continue;
     }
+
+    const orders = await fetchOrderDetails(orderIds);
+    const groups = groupOrdersByVisit(orders);
 
     // 최신 방문(visit) 선택
     let latestGroup = null;
     let latestTs = -Infinity;
     groups.forEach((g) => {
-      const maxTs = Math.max(...g.map((x) => +new Date(x.customerOrder.created_at)));
-      if (maxTs > latestTs) { latestTs = maxTs; latestGroup = g; }
+      const maxTs = Math.max(
+        ...g.map((x) => +new Date(x.customerOrder.created_at))
+      );
+      if (maxTs > latestTs) {
+        latestTs = maxTs;
+        latestGroup = g;
+      }
     });
 
     const s = summarizeVisitGroup(latestGroup);
 
+    // 최신 주문(동일 visit 내 최종)
+    const latestOrder = [...latestGroup].sort(
+      (a, b) =>
+        +new Date(b.customerOrder.created_at) -
+        +new Date(a.customerOrder.created_at)
+    )[0];
+
     results.push({
-      tableId: t.tableId, tableNumber: t.tableNumber, active: true,
-      orderStatus: s.status, items: s.items, customerName: s.customerName,
-      addAmount: s.addAmount, totalAmount: s.totalAmount, timeText: s.timeText,
+      tableId: t.tableId,
+      tableNumber: t.tableNumber,
+      active: true,
+      orderStatus: latestOrder?.customerOrder?.status ?? s.status,
+      items: s.items,
+      customerName: s.customerName,
+      addAmount: s.addAmount,
+      totalAmount: s.totalAmount,
+      timeText: s.timeText,
       visitId: s.visitId,
+      latestOrderId: latestOrder?.customerOrder?.order_id ?? null, // ✅ 추가
     });
   }
 
   return results;
 }
 
-export async function fetchOrderHistoryByTable(boothId, tableNumber) {
-  // 실제 API 예시: GET /manager/booths/:boothId/tables/:tableNumber/orders/history
-  const tables = await fetchTables(boothId);
-  const table = tables.find(t => t.tableNumber === Number(tableNumber));
-  if (!table) return delay([]);
+/* ---------------- 추가: 테이블별 주문 히스토리 ---------- */
+/** 부스/테이블ID → 주문 히스토리(내림차순) */
+export async function fetchOrderHistoryByTable(boothId, tableId) {
+  // /api/orders?boothId=:&tableId=:
+  const path = API_ORDER.GET_ORDERS_BY_TABLE(boothId, tableId);
+  const res = await req(path);
+  const rows = await res.json();
 
-  const list = MOCK_ORDERS
-    .filter(o => o.customerOrder.table_id === table.tableId)
-    .sort((a,b) => +new Date(b.customerOrder.created_at) - +new Date(a.customerOrder.created_at));
+  // rows: [{ id(orderId), tableNo, status, items[], payment{}, amount, createdAt, ... }]
+  const list = rows
+    .map((o) => ({
+      customerOrder: {
+        order_id: o.id,
+        table_id: o.tableId ?? o.tableNo ?? tableId,
+        visit_id: o.visitId ?? o.visit_id ?? 0,
+        status: o.status,
+        order_code: o.order_code ?? `ORD-${o.id}`,
+        total_amount: o.amount ?? o.total_amount ?? 0,
+        created_at: o.createdAt ?? o.created_at,
+        approved_at: o.approvedAt ?? o.approved_at ?? null,
+      },
+      orderItems: (o.items ?? []).map((it) => ({
+        name: it.name,
+        quantity: it.quantity,
+      })),
+      paymentInfo: {
+        payer_name: o.payment?.payerName ?? o.paymentInfo?.payer_name ?? "",
+        amount: o.payment?.amount ?? o.amount ?? 0,
+      },
+    }))
+    .sort(
+      (a, b) =>
+        +new Date(b.customerOrder.created_at) -
+        +new Date(a.customerOrder.created_at)
+    );
 
-  return delay(list);
+  return list;
+}
+
+/* ---------------- 주문 상태 변경 ---------------- */
+/**
+ * 주문 상태 변경 (PENDING, APPROVED, REJECTED, FINISHED)
+ * 우선 실제 경로(POST /orders/status) 사용, json-server면 PATCH /orders/:id 로 폴백
+ */
+export async function updateOrderStatus(orderId, status) {
+  console.log(orderId);
+  // 1) 실제 서버 규격: POST /api/orders/status  { order_id, status }
+
+  const res = await req(API_ORDER.UPDATE_ORDER_STATUS, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order_id: orderId, status }),
+  });
+  // 실제 서버는 200/204 가정
+  try { return delay(await res.json()); } catch { return delay(true); }
+}
+
+/* ---------------- 테이블 비우기(완료처리) ---------------- */
+/**
+ * 테이블 비우기 (active=false)
+ * 실제 규격: POST /orders/clear { tableId }
+ * json-server 폴백: PATCH /tables/:tableId { active:false }
+ */
+export async function clearTable(tableId) {
+  // 1) 실제 서버 규격
+  try {
+    const res = await req(API_ORDER.CLEAR_TABLE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tableId }),
+    });
+    try { return delay(await res.json()); } catch { return delay(true); }
+  } catch (e) {
+    // 2) json-server 폴백
+    const res = await req(`/tables/${tableId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ active: false }),
+    });
+    return delay(await res.json());
+  }
 }
