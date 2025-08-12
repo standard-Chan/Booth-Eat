@@ -21,6 +21,102 @@ const db = router.db;
 // 유틸: '/api/...'와 '/...' 둘 다 매칭되도록
 const apiPaths = (p) => [p, p.replace(/^\/api/, '')];
 
+// 주문 생성: POST /api/orders
+server.post(apiPaths('/api/orders'), (req, res) => {
+  const body = req.body || {};
+  const { boothId, tableNo, items = [], payment = {} } = body;
+
+  // --- 기본 검증 ---
+  if (!boothId || !tableNo || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ message: 'boothId, tableNo, items는 필수입니다.' });
+  }
+
+  // --- 테이블 찾기 (boothId + tableNo) ---
+  const tableRow = db.get('tables')
+    .find({ boothId: Number(boothId), tableNumber: Number(tableNo) })
+    .value();
+
+  if (!tableRow) {
+    return res.status(404).json({ message: `테이블을 찾을 수 없습니다. (boothId=${boothId}, tableNo=${tableNo})` });
+  }
+  const tableId = tableRow.tableId;
+
+  // --- 최신 OPEN visit 찾기, 없으면 새로 생성 ---
+  let openVisit = db.get('visits')
+    .filter(v => String(v.tableId) === String(tableId) && v.status === 'OPEN')
+    .sortBy(v => v.startedAt)
+    .value()
+    .pop();
+
+  if (!openVisit) {
+    const visits = db.get('visits').value();
+    const nextVisitId = visits.length ? Math.max(...visits.map(v => v.visitId || v.id || 0)) + 1 : 1;
+    const newVisit = {
+      id: nextVisitId,
+      visitId: nextVisitId,
+      tableId,
+      status: 'OPEN',
+      startedAt: new Date().toISOString(),
+    };
+    db.get('visits').push(newVisit).write();
+    openVisit = newVisit;
+  }
+  const visitId = openVisit.visitId+1;
+
+  // --- 금액 계산 (요청에 payment.amount가 있으면 우선, 없으면 items 합계) ---
+  const itemsNorm = items.map(it => ({
+    foodId: Number(it.foodId),
+    name: it.name ?? null,
+    price: Number(it.price ?? 0),
+    imageUrl: it.imageUrl ?? null,
+    quantity: Number(it.quantity ?? 1),
+  }));
+  const itemsTotal = itemsNorm.reduce((sum, it) => sum + (it.price * it.quantity), 0);
+  const totalAmount = Number(payment.amount ?? itemsTotal);
+
+  // --- orderId/id 생성 ---
+  const orders = db.get('orders').value();
+  const nextOrderId = orders.length ? Math.max(...orders.map(o => o.orderId || o.id || 0)) + 1 : 1;
+
+  // --- 주문코드 생성 (예: BE-YYYYMMDD-000123) ---
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const orderCode = `BE-${y}${m}${d}-${String(nextOrderId).padStart(6, '0')}`;
+
+  // --- 레코드 생성 ---
+  const newOrder = {
+    id: nextOrderId,
+    orderId: nextOrderId,
+    boothId: Number(boothId),
+    tableId,
+    visitId,
+    status: 'PENDING',                 // 항상 PENDING으로 시작
+    orderCode,
+    totalAmount,
+    createdAt: now.toISOString(),
+    approvedAt: null,
+    tableNo: Number(tableNo),
+    items: itemsNorm,
+    payment: {
+      payerName: payment.payerName ?? null,
+      amount: totalAmount,
+    },
+  };
+
+  db.get('orders').push(newOrder).write();
+
+  // --- 응답 (스펙대로 최소 필드만) ---
+  return res.status(201).json({
+    orderId: newOrder.orderId,
+    status: newOrder.status,
+    amount: newOrder.totalAmount,
+    createdAt: newOrder.createdAt,
+  });
+});
+
+
 // =============================================
 // 1) Custom Handlers (스펙 맞춤 가공/상태변경) - rewriter보다 먼저!!
 // =============================================

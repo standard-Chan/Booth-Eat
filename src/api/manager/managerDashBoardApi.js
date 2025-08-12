@@ -4,7 +4,9 @@
 // - 오늘의 메뉴 랭킹 API는 포함하지 않음(요청사항)
 
 import axios from "axios";
-import { BASE_URL, API_MANAGER_STATS, API_MANAGER_SALES } from "../const/api.js";
+import { BASE_URL, API_MANAGER_STATS, API_MANAGER_SALES } from "../api.js";
+
+
 
 // 공용 axios 인스턴스
 const http = axios.create({
