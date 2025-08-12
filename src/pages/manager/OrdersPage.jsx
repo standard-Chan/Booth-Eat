@@ -26,8 +26,12 @@ function formatTime(ts) {
 }
 
 /** ── 응답 스키마 전용 getter ───────────────────────────── */
-function getCO(o) { return o?.customerOrder || {}; }
-function getPI(o) { return o?.paymentInfo || {}; }
+function getCO(o) {
+  return o?.customerOrder || {};
+}
+function getPI(o) {
+  return o?.paymentInfo || {};
+}
 
 function getCreatedAt(o) {
   return getCO(o).created_at ?? null;
@@ -102,8 +106,8 @@ function combineOrdersForCard(table, orders = []) {
     orderStatus: getStatus(latest), // PENDING | APPROVED | REJECTED | FINISHED
     items: mergedItems,
     customerName,
-    addAmount,    // 최신 주문 금액
-    totalAmount,  // 모든 주문 합계
+    addAmount, // 최신 주문 금액
+    totalAmount, // 모든 주문 합계
   };
 }
 
@@ -111,7 +115,10 @@ function combineOrdersForCard(table, orders = []) {
 function pickLatestPending(orders = []) {
   return [...orders]
     .filter((o) => getStatus(o) === "PENDING")
-    .sort((a, b) => +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0))[0];
+    .sort(
+      (a, b) =>
+        +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0)
+    )[0];
 }
 
 /* ========== component ========== */
@@ -205,9 +212,22 @@ export default function ManagerOrderPage() {
   };
 
   // 테이블 비우기(visit 종료)
-  const handleClear = async (tableId) => {
+  const handleClear = async (tableId, orderIds = []) => {
     const ok = window.confirm("정말로 비우시겠습니까?");
     if (!ok) return;
+
+
+    // 모든 주문 FINISHED 처리
+    for (const oid of orderIds) {
+      try {
+        console.log(`${oid} FINISHED 처리`);
+        await setOrderStatus(oid, "FINISHED");
+      } catch (e) {
+        console.error(`주문 ${oid} FINISHED 처리 중 오류`, e);
+      }
+    }
+
+    // visit 종료
     await closeVisit(tableId);
     setRefreshKey((v) => v + 1);
   };
@@ -216,7 +236,8 @@ export default function ManagerOrderPage() {
   const handleFinish = async (tableId) => {
     const list = ordersByTable[tableId] || [];
     const latest = [...list].sort(
-      (a, b) => +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0)
+      (a, b) =>
+        +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0)
     )[0];
     const id = getOrderId(latest);
     if (!id) return;
@@ -236,11 +257,20 @@ export default function ManagerOrderPage() {
     setRefreshKey((v) => v + 1);
   };
 
-  // 카드 데이터 합성
+  // 카드 데이터 합성 (+ 각 테이블의 주문 상세 & order_id 목록도 함께 보관)
   const cards = useMemo(() => {
     return (tables || []).map((t) => {
-      const combined = combineOrdersForCard(t, ordersByTable[t.tableId] || []);
-      return { table: t, cardProps: combined };
+      const details = ordersByTable[t.tableId] || []; // 이 테이블의 모든 주문 상세
+      const combined = combineOrdersForCard(t, details);
+      const orderIds = details.map((o) => getOrderId(o)).filter(Boolean);
+
+      // 필요시 orderIds/ orders 를 OrderCard에 넘길 수도 있음 (지금은 cards 메타로만 보관)
+      return {
+        table: t,
+        cardProps: combined,
+        orderIds, // 👈 이 테이블의 주문 ID 배열
+        orders: details, // 👈 이 테이블의 주문 상세 배열 (응답 원형 유지)
+      };
     });
   }, [tables, ordersByTable]);
 
@@ -263,16 +293,19 @@ export default function ManagerOrderPage() {
         <LoaderWrap>불러오는 중...</LoaderWrap>
       ) : (
         <Grid>
-          {cards.map(({ table, cardProps }) => (
-            <OrderCard
-              key={table.tableId}
-              {...cardProps}
-              onApprove={() => handleApprove(table.tableId)}
-              onReject={() => handleReject(table.tableId)}
-              onClear={() => handleClear(table.tableId)}
-              onReceiptClick={() => handleReceiptClick(table.tableId)}
-              isHistory={false}
-            />
+          {cards.map(({ table, cardProps, orderIds }) => (
+            <>
+              <>{console.log(cards)}</>
+              <OrderCard
+                key={table.tableId}
+                {...cardProps}
+                onApprove={() => handleApprove(table.tableId)}
+                onReject={() => handleReject(table.tableId)}
+                onClear={() => handleClear(table.tableId, orderIds)}
+                onReceiptClick={() => handleReceiptClick(table.tableId)}
+                isHistory={false}
+              />
+            </>
           ))}
         </Grid>
       )}
