@@ -36,7 +36,7 @@ function handleApiError(err) {
 export async function createManager(boothId, payload) {
   try {
     const url = API_ADMIN_MANAGER.CREATE_MANAGER(boothId);
-    const res = await client.post(url, payload);
+    const res = await client.patch(url, payload);
     return res.data; // 보통 빈 바디거나 생성 정보가 올 수 있음
   } catch (err) {
     handleApiError(err);
