@@ -59,6 +59,7 @@ export async function addMenu(boothId, data) {
 
   if (useForm) {
     const fd = new FormData();
+    fd.append('boothId', data.boothId);
     fd.append('name', data.name);
     fd.append('price', String(data.price));
     if (typeof data.available === 'boolean') fd.append('available', String(data.available));
@@ -69,6 +70,7 @@ export async function addMenu(boothId, data) {
   } else {
     options.headers = jsonHeaders;
     options.body = JSON.stringify({
+      boothId: data.boothId,
       name: data.name,
       price: data.price,
       available: data.available ?? true,

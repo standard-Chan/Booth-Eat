@@ -56,6 +56,7 @@ export default function MenuManagePage() {
   // 인라인 추가/수정 상태
   const [creating, setCreating] = useState(false);
   const [createDraft, setCreateDraft] = useState({
+    boothId: boothId,
     name: "",
     price: "",
     description: "",
@@ -117,6 +118,7 @@ export default function MenuManagePage() {
   const handleEdit = (item) => {
     setEditingId(item.menuItemId);
     setEditDraft({
+      boothId: boothId,
       name: item.name ?? "",
       price: item.price ?? "",
       description: item.description ?? "",
@@ -132,6 +134,7 @@ export default function MenuManagePage() {
     if (!id) return;
 
     const payload = {
+      boothId: boothId,
       name: editDraft.name?.trim(),
       price: Number(editDraft.price),
       description: editDraft.description?.trim(),
@@ -200,6 +203,7 @@ export default function MenuManagePage() {
             onCancel={() => {
               setCreating(false);
               setCreateDraft({
+                boothId: boothId,
                 name: "",
                 price: "",
                 description: "",
