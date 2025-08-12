@@ -1,0 +1,972 @@
+{
+  "booths": [
+    {
+      "id": 1,
+      "name": "핫도그부스"
+    },
+    {
+      "id": 2,
+      "name": "분식부스"
+    }
+  ],
+  "menus": [
+    {
+      "id": 2,
+      "menuItemId": 2,
+      "boothId": 1,
+      "name": "치즈핫도그",
+      "price": 5000,
+      "available": false,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "32132",
+      "category": "FOOD"
+    },
+    {
+      "id": 3,
+      "menuItemId": 3,
+      "boothId": 1,
+      "name": "콜라",
+      "price": 2000,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": null,
+      "category": "FOOD"
+    },
+    {
+      "id": 4,
+      "menuItemId": 4,
+      "boothId": 1,
+      "name": "테스트핫도그-5387",
+      "price": 4500,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "테스트 메뉴",
+      "category": "FOOD"
+    },
+    {
+      "id": 5,
+      "menuItemId": 5,
+      "boothId": 1,
+      "name": "신메뉴",
+      "price": 123,
+      "available": false,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "몰라",
+      "category": "FOOD"
+    },
+    {
+      "id": 6,
+      "menuItemId": 6,
+      "boothId": 1,
+      "name": "메뉴",
+      "price": 3232,
+      "available": false,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "",
+      "category": "FOOD"
+    },
+    {
+      "id": 7,
+      "menuItemId": 7,
+      "boothId": 1,
+      "name": "새로운 메뉴",
+      "price": 123232,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "23232",
+      "category": "FOOD"
+    },
+    {
+      "id": 8,
+      "menuItemId": 8,
+      "boothId": 1,
+      "name": "메뉴",
+      "price": 0,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": null,
+      "category": "FOOD"
+    },
+    {
+      "id": 9,
+      "menuItemId": 9,
+      "boothId": 2,
+      "name": "ㅇㄴㅁ",
+      "price": 323,
+      "available": false,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "2131",
+      "category": "FOOD"
+    },
+    {
+      "id": 10,
+      "menuItemId": 10,
+      "boothId": 2,
+      "name": "ㅁㅇㅁㄴㅇㅁ",
+      "price": 2313123,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "3213213",
+      "category": "FOOD"
+    },
+    {
+      "id": 11,
+      "menuItemId": 11,
+      "boothId": 2,
+      "name": "콜라",
+      "price": 3000,
+      "available": true,
+      "modelUrl": null,
+      "previewImage": null,
+      "description": "코코코",
+      "category": "DRINK"
+    }
+  ],
+  "accounts": {
+    "id": 1,
+    "boothId": 1,
+    "bank": "카카오뱅크",
+    "account": "123-****-****",
+    "accountHolder": "정석찬"
+  },
+  "tables": [
+    {
+      "id": 1,
+      "tableId": 1,
+      "boothId": 1,
+      "tableNumber": 1,
+      "active": true
+    },
+    {
+      "id": 2,
+      "tableId": 2,
+      "boothId": 1,
+      "tableNumber": 2,
+      "active": false
+    },
+    {
+      "id": 3,
+      "tableId": 3,
+      "boothId": 1,
+      "tableNumber": 3,
+      "active": false
+    },
+    {
+      "id": 4,
+      "tableId": 4,
+      "boothId": 1,
+      "tableNumber": 4,
+      "active": true
+    },
+    {
+      "id": 5,
+      "tableId": 5,
+      "boothId": 1,
+      "tableNumber": 5,
+      "active": true
+    },
+    {
+      "id": 6,
+      "tableId": 6,
+      "boothId": 1,
+      "tableNumber": 6,
+      "active": true
+    },
+    {
+      "id": 7,
+      "tableId": 7,
+      "boothId": 1,
+      "tableNumber": 7,
+      "active": true
+    },
+    {
+      "id": 8,
+      "tableId": 8,
+      "boothId": 1,
+      "tableNumber": 8,
+      "active": true
+    },
+    {
+      "id": 9,
+      "tableId": 9,
+      "boothId": 1,
+      "tableNumber": 9,
+      "active": true
+    },
+    {
+      "id": 10,
+      "tableId": 10,
+      "boothId": 2,
+      "tableNumber": 1,
+      "active": true
+    },
+    {
+      "id": 11,
+      "tableId": 11,
+      "boothId": 2,
+      "tableNumber": 2,
+      "active": true
+    },
+    {
+      "id": 12,
+      "tableId": 12,
+      "boothId": 2,
+      "tableNumber": 3,
+      "active": true
+    }
+  ],
+  "visits": [
+    {
+      "id": 10,
+      "visitId": 10,
+      "tableId": 1,
+      "visitNo": 3,
+      "status": "OPEN",
+      "startedAt": "2025-08-11T01:00:00Z",
+      "closedAt": null
+    },
+    {
+      "id": 11,
+      "visitId": 11,
+      "tableId": 4,
+      "visitNo": 1,
+      "status": "OPEN",
+      "startedAt": "2025-08-11T02:10:00Z",
+      "closedAt": null
+    },
+    {
+      "id": 12,
+      "visitId": 20,
+      "tableId": 2,
+      "visitNo": 1,
+      "status": "CLOSED",
+      "startedAt": "2025-08-11T02:30:00Z",
+      "closedAt": "2025-08-11T20:41:28.749Z"
+    },
+    {
+      "id": 21,
+      "visitId": 21,
+      "tableId": 2,
+      "status": "OPEN",
+      "startedAt": "2025-08-11T21:30:57.459Z"
+    },
+    {
+      "id": 22,
+      "visitId": 22,
+      "tableId": 10,
+      "status": "OPEN",
+      "startedAt": "2025-08-12T02:03:45.165Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": 123,
+      "orderId": 123,
+      "boothId": 1,
+      "tableId": 7,
+      "visitId": 10,
+      "status": "PENDING",
+      "orderCode": "BE-20250811-000123",
+      "totalAmount": 43000,
+      "createdAt": "2025-08-09T11:30:00Z",
+      "approvedAt": null,
+      "tableNo": 7,
+      "items": [
+        {
+          "foodId": 11,
+          "name": "오징어튀김",
+          "price": 7000,
+          "imageUrl": "/images/sample2.jpg",
+          "quantity": 2
+        },
+        {
+          "foodId": 1,
+          "name": "치즈버거",
+          "price": 5000,
+          "imageUrl": "/images/sample1.jpg",
+          "quantity": 3
+        }
+      ],
+      "payment": {
+        "payerName": "정석찬",
+        "amount": 43000
+      }
+    },
+    {
+      "id": 124,
+      "orderId": 124,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "FINISHED",
+      "orderCode": "BE-20250811-000124",
+      "totalAmount": 10000,
+      "createdAt": "2025-08-11T01:23:45Z",
+      "approvedAt": "2025-08-11T01:25:00Z",
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 1,
+          "name": "핫도그",
+          "price": 4000,
+          "imageUrl": null,
+          "quantity": 2
+        },
+        {
+          "foodId": 3,
+          "name": "콜라",
+          "price": 2000,
+          "imageUrl": null,
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "홍길동",
+        "amount": 10000
+      }
+    },
+    {
+      "id": 125,
+      "orderId": 125,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "FINISHED",
+      "orderCode": "BE-20250811-000125",
+      "totalAmount": 15000,
+      "createdAt": "2025-08-11T01:40:00Z",
+      "approvedAt": "2025-08-11T01:41:00Z",
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 2,
+          "name": "치즈핫도그",
+          "price": 5000,
+          "imageUrl": null,
+          "quantity": 3
+        }
+      ],
+      "payment": {
+        "payerName": "김철수",
+        "amount": 15000
+      }
+    },
+    {
+      "id": 129,
+      "orderId": 129,
+      "boothId": 1,
+      "tableId": 2,
+      "visitId": 20,
+      "status": "FINISHED",
+      "orderCode": "BE-20250811-000129",
+      "totalAmount": 10000,
+      "createdAt": "2025-08-11T01:23:45Z",
+      "approvedAt": "2025-08-11T01:25:00Z",
+      "tableNo": 2,
+      "items": [
+        {
+          "foodId": 1,
+          "name": "핫도그",
+          "price": 4000,
+          "imageUrl": null,
+          "quantity": 2
+        },
+        {
+          "foodId": 3,
+          "name": "콜라",
+          "price": 2000,
+          "imageUrl": null,
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "홍길동",
+        "amount": 10000
+      }
+    },
+    {
+      "boothId": 2,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      },
+      "id": 130
+    },
+    {
+      "boothId": 2,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      },
+      "id": 131
+    },
+    {
+      "boothId": 1,
+      "tableNo": "1",
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "1231",
+        "amount": 4500
+      },
+      "id": 132
+    },
+    {
+      "boothId": 1,
+      "tableNo": "1",
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "1231",
+        "amount": 4500
+      },
+      "id": 133
+    },
+    {
+      "id": 134,
+      "orderId": 134,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "REJECTED",
+      "orderCode": "BE-20250812-000134",
+      "totalAmount": 15500,
+      "createdAt": "2025-08-11T21:25:18.114Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 3,
+          "name": "콜라",
+          "price": 2000,
+          "imageUrl": "",
+          "quantity": 1
+        },
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 3
+        }
+      ],
+      "payment": {
+        "payerName": "정석찬",
+        "amount": 15500
+      }
+    },
+    {
+      "id": 135,
+      "orderId": 135,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000135",
+      "totalAmount": 4500,
+      "createdAt": "2025-08-11T21:26:32.520Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "아나",
+        "amount": 4500
+      }
+    },
+    {
+      "id": 136,
+      "orderId": 136,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 10,
+      "status": "APPROVED",
+      "orderCode": "BE-20250812-000136",
+      "totalAmount": 13500,
+      "createdAt": "2025-08-11T21:28:20.188Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 3
+        }
+      ],
+      "payment": {
+        "payerName": "3213",
+        "amount": 13500
+      }
+    },
+    {
+      "id": 137,
+      "orderId": 137,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 11,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000137",
+      "totalAmount": 22500,
+      "createdAt": "2025-08-11T21:30:25.770Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 5
+        }
+      ],
+      "payment": {
+        "payerName": "ㄴㅁ",
+        "amount": 22500
+      }
+    },
+    {
+      "id": 138,
+      "orderId": 138,
+      "boothId": 1,
+      "tableId": 2,
+      "visitId": 22,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000138",
+      "totalAmount": 14000,
+      "createdAt": "2025-08-11T21:30:57.460Z",
+      "approvedAt": null,
+      "tableNo": 2,
+      "items": [
+        {
+          "foodId": 3,
+          "name": "콜라",
+          "price": 2000,
+          "imageUrl": "",
+          "quantity": 7
+        }
+      ],
+      "payment": {
+        "payerName": "ㄴㅇ",
+        "amount": 14000
+      }
+    },
+    {
+      "id": 139,
+      "orderId": 139,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000139",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:03:45.166Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "ㅇㅁㄴ",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 140,
+      "orderId": 140,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000140",
+      "totalAmount": 323,
+      "createdAt": "2025-08-12T02:06:49.013Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "2342",
+        "amount": 323
+      }
+    },
+    {
+      "id": 141,
+      "orderId": 141,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000141",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:10:34.433Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 142,
+      "orderId": 142,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "REJECTED",
+      "orderCode": "BE-20250812-000142",
+      "totalAmount": 323,
+      "createdAt": "2025-08-12T02:14:02.099Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "321",
+        "amount": 323
+      }
+    },
+    {
+      "id": 143,
+      "orderId": 143,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "FINISHED",
+      "orderCode": "BE-20250812-000143",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:19:29.459Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 144,
+      "orderId": 144,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "FINISHED",
+      "orderCode": "BE-20250812-000144",
+      "totalAmount": 1292,
+      "createdAt": "2025-08-12T02:19:48.622Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 4
+        }
+      ],
+      "payment": {
+        "payerName": "432234",
+        "amount": 1292
+      }
+    },
+    {
+      "id": 145,
+      "orderId": 145,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "APPROVED",
+      "orderCode": "BE-20250812-000145",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:27:33.969Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "213",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 146,
+      "orderId": 146,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "APPROVED",
+      "orderCode": "BE-20250812-000146",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:27:59.204Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "32",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 147,
+      "orderId": 147,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "REJECTED",
+      "orderCode": "BE-20250812-000147",
+      "totalAmount": 323,
+      "createdAt": "2025-08-12T02:30:37.737Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "312",
+        "amount": 323
+      }
+    },
+    {
+      "id": 148,
+      "orderId": 148,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "APPROVED",
+      "orderCode": "BE-20250812-000148",
+      "totalAmount": 3000,
+      "createdAt": "2025-08-12T02:41:27.595Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 11,
+          "name": "콜라",
+          "price": 3000,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "213123",
+        "amount": 3000
+      }
+    }
+  ],
+  "menuMetrics": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "menuItemId": 3,
+      "totalOrderQuantity": 48
+    }
+  ],
+  "todayStats": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "date": "2025-08-11",
+      "totalOrders": 7,
+      "totalAmount": 54000,
+      "peakHour": 14,
+      "topItems": [
+        {
+          "menuItemId": 1,
+          "name": "핫도그",
+          "qty": 8,
+          "amount": 32000
+        },
+        {
+          "menuItemId": 3,
+          "name": "콜라",
+          "qty": 5,
+          "amount": 10000
+        }
+      ]
+    }
+  ],
+  "menuRankings": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "date": "2025-08-11",
+      "metric": "qty",
+      "items": [
+        {
+          "menuItemId": 1,
+          "name": "핫도그",
+          "qty": 8,
+          "amount": 32000
+        },
+        {
+          "menuItemId": 3,
+          "name": "콜라",
+          "qty": 5,
+          "amount": 10000
+        }
+      ]
+    }
+  ],
+  "devTableContexts": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "tableNo": 1,
+      "currentVisit": {
+        "visitId": 10,
+        "visitNo": 3,
+        "status": "OPEN",
+        "startedAt": "2025-08-11T01:00:00Z",
+        "closedAt": null
+      },
+      "recentOrders": [
+        {
+          "orderId": 123,
+          "orderCode": "BE-20250811-000123",
+          "status": "APPROVED",
+          "totalAmount": 10000,
+          "createdAt": "2025-08-11T01:23:45Z",
+          "approvedAt": "2025-08-11T01:25:00Z",
+          "visitId": 10
+        }
+      ]
+    }
+  ],
+  "dateSales": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "date": "2025-08-11",
+      "totalSales": 720000,
+      "orderNumbers": 44
+    }
+  ],
+  "menuSales": [
+    {
+      "id": 1,
+      "boothId": 1,
+      "items": [
+        {
+          "menuItemId": 3,
+          "name": "오징어 튀김",
+          "totalSales": 150000
+        },
+        {
+          "menuItemId": 5,
+          "name": "김치볶음밥",
+          "totalSales": 230000
+        }
+      ]
+    }
+  ]
+}
