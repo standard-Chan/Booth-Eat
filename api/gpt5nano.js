@@ -19,12 +19,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "prompt는 문자열이어야 합니다.", ok: false });
     }
 
-    const hasKey = !!process.env.OPENAI_API_KEY;
+    const hasKey = !!process.env.REACT_APP_OPENAI_API_KEY;
     if (!hasKey) {
       return res.status(500).json({ message: "OPENAI_API_KEY 미설정", ok: false });
     }
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: process.env.REACT_APP_OPENAI_API_KEY });
 
     const r = await openai.chat.completions.create({
       model: "gpt-5-nano",
