@@ -6,7 +6,7 @@
 //   - 배포: https://modney.shop/api (동일 path 사용)
 // ========================
 
-export const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8080';
+export const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8080/api';
 // 배포 시 'https://modney.shop/api'
 export const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
