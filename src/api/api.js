@@ -159,3 +159,17 @@ export const API_MANAGER_SALES = {
   // GET /api/manager/booths/{boothId}/stats/menu-sales
   GET_MENU_SALES: (boothId) => `/manager/booths/${boothId}/stats/menu-sales`,
 };
+
+
+// ---------------------------------------------------------------------
+// 6) 부스 매니저 설정 (어드민)
+// ---------------------------------------------------------------------
+export const API_ADMIN_MANAGER = {
+  // 매니저 생성 (최초 1회)
+  // POST /api/admin/booths/{boothId}/manager
+  CREATE_MANAGER: (boothId) => `/admin/booths/${boothId}/manager`,
+
+  // 매니저 정보 조회
+  // GET /api/admin/booths/{boothId}/manager
+  GET_MANAGER: (boothId) => `/admin/booths/${boothId}/manager`,
+};
