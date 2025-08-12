@@ -12,6 +12,19 @@ const Row = styled.div`
   gap: 12px;
 `;
 
+const Select = styled.select`
+  height: 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 1px;
+  font-size: 14px;
+  background: #fff;
+  &:focus {
+    outline: none;
+    border-color: #d1d5db;
+  }
+`;
+
 const ImageBox = styled.label`
   width: 56px;
   height: 56px;
@@ -144,6 +157,13 @@ export default function MenuEditorRow({
               set("price", e.target.value.replace(/\D/g, "").slice(0, 9))
             }
           />
+          <Select
+            value={draft.category ?? "FOOD"}
+            onChange={(e) => set("category", e.target.value)}
+          >
+            <option value="FOOD">음식</option>
+            <option value="DRINK">음료</option>
+          </Select>
         </Row1>
 
         <Area

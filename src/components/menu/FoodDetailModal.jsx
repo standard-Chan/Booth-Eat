@@ -7,7 +7,6 @@ export default function FoodDetailModal({ open, item, onClose, onAdd }) {
 
   // 모달 열릴 때마다 수량 초기화
   useEffect(() => {
-    console.log(item)
     if (open) {
       setQty(1);
     }

@@ -151,7 +151,7 @@ export default function OrderHistoryPage() {
                 <MetaRow>
                   <MetaCol>
                     <MetaLabel>총 금액</MetaLabel>
-                    <MetaStrong>{(o.amount || 0).toLocaleString()}원</MetaStrong>
+                    <MetaStrong>{(o.payment.amount || 0).toLocaleString()}원</MetaStrong>
                   </MetaCol>
 
                   <MetaColRight>

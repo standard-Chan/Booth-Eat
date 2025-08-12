@@ -122,7 +122,7 @@ export const API_MANAGER_MENUS = {
   // 메뉴 추가
   // POST /api/manager/booths/{boothId}/menus
   // Body:
-  // { boothId, name, price, available, previewImage, description }
+  // { boothId, name, price, available, previewImage, description, category }
   ADD_MENU: (boothId) => `/manager/booths/${boothId}/menus`,
 
   // 메뉴 삭제

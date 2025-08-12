@@ -61,6 +61,7 @@ export default function MenuManagePage() {
     description: "",
     previewImage: null,
     available: true,
+    category: "FOOD", // 추가: 기본값
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -79,6 +80,7 @@ export default function MenuManagePage() {
   };
 
   useEffect(() => {
+    if (!boothId) return;
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boothId]);
@@ -120,10 +122,11 @@ export default function MenuManagePage() {
       description: item.description ?? "",
       previewImage: item.previewImage ?? null,
       available: item.available ?? true,
-      category: item.category ?? "FOOD",
+      category: item.category ?? "FOOD", // 추가: 기본값
     });
   };
 
+  // 수정 저장
   const submitEdit = async () => {
     const id = editingId;
     if (!id) return;
@@ -134,7 +137,7 @@ export default function MenuManagePage() {
       description: editDraft.description?.trim(),
       previewImage: editDraft.previewImage ?? null,
       available: editDraft.available,
-      category: editDraft.category ?? "FOOD",
+      category: editDraft.category ?? "FOOD", // 추가: 전달
     };
 
     try {
@@ -159,7 +162,7 @@ export default function MenuManagePage() {
         description: createDraft.description?.trim(),
         available: true,
         previewImage: createDraft.previewImage ?? null,
-        category: createDraft.category ?? "FOOD",
+        category: createDraft.category ?? "FOOD", // 추가: 전달
       });
       setCreating(false);
       setCreateDraft({
@@ -168,6 +171,7 @@ export default function MenuManagePage() {
         description: "",
         previewImage: null,
         available: true,
+        category: "FOOD",
       });
       await reload();
     } catch (e) {
@@ -199,6 +203,7 @@ export default function MenuManagePage() {
                 description: "",
                 previewImage: null,
                 available: true,
+                category: "FOOD",
               });
             }}
             onSubmit={submitCreate}

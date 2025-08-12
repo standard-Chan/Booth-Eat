@@ -5,7 +5,6 @@ import OrderCard from "./OrderCard.jsx";
 
 import { getTableOrders, setOrderStatus } from "../../api/manager/orderApi.js";
 
-
 export default function OrderHistoryModal({
   open,
   boothId,
@@ -20,14 +19,18 @@ export default function OrderHistoryModal({
   const listRef = useRef(null);
   const colRefs = useRef([]);
 
+  const reload = async () => {
+    const data = await getTableOrders(boothId, tableId);
+    setOrders(Array.isArray(data) ? data : []);
+  };
+
   useEffect(() => {
     if (!open || !boothId || !tableId) return;
     setLoading(true);
     setError(null);
     (async () => {
       try {
-        const data = await getTableOrders(boothId, tableId);
-        setOrders(Array.isArray(data) ? data : []);
+        await reload();
       } catch (e) {
         setError("주문 이력을 불러오지 못했습니다.");
       } finally {
@@ -62,14 +65,13 @@ export default function OrderHistoryModal({
     )}.${String(d.getDate()).padStart(2, "0")}`;
   };
 
-  // 팝업에서 개별 주문만 FINISHED 처리
-  const handleFinishOne = async (orderId) => {
+  // 공통 상태 변경 함수
+  const handleSetStatus = async (orderId, next) => {
     try {
-      await setOrderStatus(orderId, "FINISHED");
-      const data = await getTableOrders(boothId, tableId);
-      setOrders(Array.isArray(data) ? data : []);
+      await setOrderStatus(orderId, next);
+      await reload();
     } catch (e) {
-      alert("주문 완료 처리에 실패했습니다.");
+      alert(`주문 상태 변경 실패: ${next}`);
     }
   };
 
@@ -77,6 +79,7 @@ export default function OrderHistoryModal({
   const toCardProps = (o) => {
     const status = (o?.status || "").toUpperCase(); // PENDING | APPROVED | REJECTED | FINISHED
     const amount = o?.payment?.amount ?? o?.totalAmount ?? 0;
+    const id = o?.orderId ?? o?.id;
 
     return {
       tableNo: tableNumber,
@@ -90,9 +93,9 @@ export default function OrderHistoryModal({
       customerName: o?.payment?.payerName || "-",
       addAmount: amount,
       totalAmount: amount,
-      onApprove: undefined,
-      onReject: undefined,
-      onClear: () => handleFinishOne(o?.orderId), // 이 주문만 FINISHED
+      onApprove: () => handleSetStatus(id, "APPROVED"),
+      onReject: () => handleSetStatus(id, "REJECTED"),
+      onClear: () => handleSetStatus(id, "FINISHED"),
       onReceiptClick: () => {},
     };
   };
