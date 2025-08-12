@@ -157,6 +157,7 @@ export default function MenuManagePage() {
 
     try {
       await addMenu(boothId, {
+        boothId: boothId,
         name: createDraft.name.trim(),
         price: Number(createDraft.price),
         description: createDraft.description?.trim(),
@@ -166,6 +167,7 @@ export default function MenuManagePage() {
       });
       setCreating(false);
       setCreateDraft({
+        boothId: boothId,
         name: "",
         price: "",
         description: "",
