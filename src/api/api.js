@@ -5,10 +5,17 @@
 //   - 로컬: http://localhost:8080/api
 //   - 배포: https://modney.shop/api (동일 path 사용)
 // ========================
-export const BASE_URL = 'http://localhost:8080/api'; // 배포 시 'https://modney.shop/api'
+
+export const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8080';
+// 배포 시 'https://modney.shop/api'
+export const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
 // path → 완전한 URL을 원할 때 사용 (axios/fetch에 바로 넣어도 됨)
 export const toURL = (path) => `${BASE_URL}${path}`;
+
+if (!OPENAI_API_KEY) {
+  console.warn('⚠️  OPENAI_API_KEY가 설정되어 있지 않습니다. GPT 호출 시 오류가 날 수 있습니다.');
+}
 
 // 안전한 쿼리 문자열 빌더 (undefined/null은 자동 제거)
 const qs = (paramsObj = {}) =>
