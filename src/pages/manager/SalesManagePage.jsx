@@ -177,10 +177,10 @@ export default function SalesManagePage() {
             value={summary.totalSales}
             isMoney
           />
-          <StatCard
+          {/* <StatCard
             title={`주문 건수(${isToday(date) ? "오늘" : "선택일"})`}
             value={summary.orderNumbers}
-          />
+          /> */}
           {isToday(date) && (
             <StatCard
               title="판매량(오늘)"
