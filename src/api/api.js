@@ -67,13 +67,13 @@ export const API_PUBLIC = {
 export const API_MANAGER_STATS = {
   // 오늘 기준 현황(승인건만)
   // GET /api/manager/stats/today?boothId={id}&top={n}
-  GET_TODAY_STATS: (boothId, top) =>
-    `/manager/stats/today?${qs({ boothId, top })}`,
+  // GET_TODAY_STATS: (boothId, top) =>
+  //   `/manager/stats/today?${qs({ boothId, top })}`,
 
   // 오늘의 메뉴 랭킹
-  // GET /api/manager/rankings/menu?boothId={id}&metric=qty|amount&limit={n}
-  GET_TODAY_MENU_RANKING: (boothId, metric = 'qty', limit) =>
-    `/manager/rankings/menu?${qs({ boothId, metric, limit })}`,
+  // GET /api/manager/rankings/menu?boothId={id}&limit={n}
+  GET_TODAY_MENU_RANKING: (boothId, limit) =>
+    `/manager/rankings/menu?${qs({ boothId, limit })}`,
 
   // 개발/디버그용 테이블 컨텍스트
   // GET /api/dev/table-context?boothId={id}&tableNo={no}

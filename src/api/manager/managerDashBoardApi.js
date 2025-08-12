@@ -37,10 +37,10 @@ function parseAxiosError(err) {
  * @param {number|string} boothId
  * @param {number} [top]  상위 n개
  */
-export async function getTodayStats(boothId, top) {
+export async function getTodayStats(boothId, limit) {
   if (boothId == null) throw new Error("boothId가 필요합니다.");
   try {
-    const url = API_MANAGER_STATS.GET_TODAY_STATS(boothId, top);
+    const url = API_MANAGER_STATS.GET_TODAY_MENU_RANKING(boothId, limit);
     const { data } = await http.get(url);
     return data;
   } catch (err) {

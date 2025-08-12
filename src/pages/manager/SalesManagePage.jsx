@@ -38,16 +38,33 @@ const DateBox = styled.div`
     padding: 0 10px;
   }
 `;
+const Toggle = styled.div`
+  display: inline-flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  > button {
+    padding: 6px 10px;
+    font-size: 13px;
+    border: none;
+    background: #fff;
+    cursor: pointer;
+  }
+  > button.active {
+    background: #111827;
+    color: #fff;
+  }
+`;
 
-// TodayStatsResponse.topItems -> 차트용 포맷
-const toBarItems = (topItems = []) =>
-  topItems.map(({ menuItemId, name, amount }) => ({
+// 오늘 응답(items[{ qty, amount }])을 차트용으로 변환
+const mapTodayItemsToBars = (items = [], metric = "amount") =>
+  items.map(({ menuItemId, name, qty, amount }) => ({
     menuItemId,
     name,
-    totalSales: Number(amount || 0),
+    totalSales: Number(metric === "qty" ? qty || 0 : amount || 0),
   }));
 
-// 응답이 { items: [...] } 또는 [...] 둘 다 수용
+// 누적 응답이 { items: [...] } 또는 [...] 둘 다 수용
 const normalizeTotal = (resp) => {
   const arr = Array.isArray(resp) ? resp : resp?.items;
   return (arr || []).map(({ menuItemId, name, totalSales }) => ({
@@ -64,14 +81,21 @@ const isToday = (yyyyMMdd) => {
 
 export default function SalesManagePage() {
   const { boothId } = useParams(); // /manager/:boothId/sales
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10)); // 표시용
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+
+  // 상단 카드 요약
   const [summary, setSummary] = useState({
-    totalSales: 0,
+    totalSales: 0, // 금액 합
+    totalQty: 0,   // 수량 합(오늘만)
     orderNumbers: 0,
     peakHour: null,
   });
-  const [menuToday, setMenuToday] = useState([]); // 선택일 Top N (오늘일 때만 채움)
-  const [menuTotal, setMenuTotal] = useState([]); // 전체(누적)
+
+  // 오늘/선택일 차트 데이터
+  const [chartMetric, setChartMetric] = useState("amount"); // 'amount' | 'qty'
+  const [todayRawItems, setTodayRawItems] = useState([]);   // getTodayStats().items 보관
+  const [menuToday, setMenuToday] = useState([]);           // 오늘(또는 선택일 TopN) 차트용
+  const [menuTotal, setMenuTotal] = useState([]);           // 전체(누적) 차트용
 
   const load = async () => {
     // 항상 전체(누적) 가져오기
@@ -79,42 +103,56 @@ export default function SalesManagePage() {
     setMenuTotal(normalizeTotal(total));
 
     if (isToday(date)) {
-      // 오늘: 오늘 전용 API(peakHour/TopN 지원)
+      // 오늘: 금액/수량 합계를 items에서 직접 계산
       const t = await getTodayStats(boothId, 10);
+      const items = Array.isArray(t?.items) ? t.items : [];
+      const totalAmount = items.reduce((s, it) => s + Number(it.amount || 0), 0);
+      const totalQty = items.reduce((s, it) => s + Number(it.qty || 0), 0);
+
       setSummary({
-        totalSales: Number(t?.totalAmount ?? 0),
-        orderNumbers: Number(t?.totalOrders ?? 0),
+        totalSales: totalAmount,
+        totalQty,
+        orderNumbers: Number(t?.totalOrders ?? 0), // 없으면 0
         peakHour: t?.peakHour ?? null,
       });
-      setMenuToday(toBarItems(t?.topItems || []));
+
+      setTodayRawItems(items);
+      setMenuToday(mapTodayItemsToBars(items, chartMetric)); // 현재 토글 기준으로 변환
     } else {
-      // 과거/미래 날짜: 일자 요약만 (TopN 없음)
+      // 과거/미래 날짜: 일자 요약만
       const s = await getDateSales(boothId, date);
       setSummary({
         totalSales: Number(s?.totalSales ?? 0),
+        totalQty: 0, // 선택일 수량 정보는 없음
         orderNumbers: Number(s?.orderNumbers ?? 0),
-        peakHour: null, // 해당 API에 없음
+        peakHour: null,
       });
-      setMenuToday([]); // 선택일 TopN 데이터가 없으니 비움(차트는 전체만 그려짐)
+      setTodayRawItems([]);
+      setMenuToday([]); // 선택일 TopN 없음
     }
   };
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boothId, date]);
 
-  // 상단 메시지: 전체 합계 vs 선택일 합계
+  // 차트 토글이 바뀌면 오늘 데이터만 재매핑
+  useEffect(() => {
+    if (!isToday(date)) return;
+    setMenuToday(mapTodayItemsToBars(todayRawItems, chartMetric));
+  }, [chartMetric, todayRawItems, date]);
+
+  // 상단 메시지: 전체 합계 대비 선택일(오늘) 비율 (금액 기준)
   const topMessage = useMemo(() => {
-    const daySum = menuToday.reduce((a, b) => a + (b.totalSales || 0), 0);
-    // 선택일이 오늘이 아닐 수 있으므로 카드의 합계를 우선 사용 (topItems가 비어도 정확)
-    const selectedDayTotal = summary.totalSales || daySum;
     const totalSum = menuTotal.reduce((a, b) => a + (b.totalSales || 0), 0);
+    const selectedDayTotal = Number(summary.totalSales || 0);
     const share =
       totalSum > 0 ? Math.round((selectedDayTotal / totalSum) * 100) : 0;
     return `선택일 매출 ${formatKRW(selectedDayTotal)} (전체 누적 ${formatKRW(
       totalSum
     )}의 ${share}%)`;
-  }, [summary.totalSales, menuToday, menuTotal]);
+  }, [summary.totalSales, menuTotal]);
 
   return (
     <AppLayout title="매출 관리">
@@ -143,17 +181,43 @@ export default function SalesManagePage() {
             title={`주문 건수(${isToday(date) ? "오늘" : "선택일"})`}
             value={summary.orderNumbers}
           />
+          {isToday(date) && (
+            <StatCard
+              title="판매량(오늘)"
+              value={summary.totalQty}
+            />
+          )}
           {isToday(date) && summary.peakHour != null && (
             <StatCard title="피크 타임" value={`${summary.peakHour}시`} />
           )}
         </Row>
 
-        <h3 style={{ margin: "18px 0 6px" }}>
-          메뉴별 판매액 — 전체(누적)
-          {isToday(date) ? " vs 오늘(Top 10)" : " (선택일 Top N 데이터 없음)"}
-        </h3>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
+          <h3 style={{ margin: "18px 0 6px" }}>
+            메뉴별 {chartMetric === "amount" ? "매출액" : "판매량"} — 전체(누적)
+            {isToday(date) ? " vs 오늘(Top 10)" : " (선택일 Top N 데이터 없음)"}
+          </h3>
+          {isToday(date) && (
+            <Toggle>
+              <button
+                className={chartMetric === "amount" ? "active" : ""}
+                onClick={() => setChartMetric("amount")}
+              >
+                금액(₩)
+              </button>
+              <button
+                className={chartMetric === "qty" ? "active" : ""}
+                onClick={() => setChartMetric("qty")}
+              >
+                수량(개)
+              </button>
+            </Toggle>
+          )}
+        </div>
+
         <Row>
-          {/* itemsYesterday: 전체(누적), itemsToday: 오늘(또는 선택일 TopN이 없으면 빈 배열) */}
+          {/* itemsToday: 오늘(Top10) — 금액/수량 토글 반영
+              itemsYesterday: 전체(누적) — 금액 기준 */}
           <SalesBarChart itemsToday={menuToday} itemsYesterday={menuTotal} />
         </Row>
       </Section>
