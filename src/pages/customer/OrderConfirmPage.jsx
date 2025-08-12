@@ -2,16 +2,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../../components/common/Header.jsx";
-import { selectCartTotalAmount, selectCartItems } from "../../store/cartSlice.js";
+import {
+  selectCartTotalAmount,
+  selectCartItems,
+} from "../../store/cartSlice.js";
 import { paths } from "../../routes/paths.js";
 import { showErrorToast, showSuccessToast } from "../../utils/toast.js";
 import { getBoothAccount, createOrder } from "../../api/customerApi.js";
+import { addOrderId } from "../../store/orderIdsSlice.js";
 
 export default function OrderConfirmPage() {
   const { boothId, tableId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const totalAmount = useSelector(selectCartTotalAmount);
   const cartItems = useSelector(selectCartItems); // 없으면: (state) => state.cart.items
@@ -48,7 +53,9 @@ export default function OrderConfirmPage() {
       }
     }
     if (boothId) fetchAccount();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [boothId]);
 
   // 입력값 정리
@@ -58,8 +65,8 @@ export default function OrderConfirmPage() {
   const tableNo = useMemo(() => {
     const s = sessionStorage.getItem("tableNo");
     const n = Number(s);
-    return Number.isFinite(n) && n > 0 ? n : 1;
-  }, []);
+    return Number.isFinite(n) && n > 0 ? n : Number(tableId) || 1;
+  }, [tableId]);
 
   const submit = async () => {
     if (!name.trim()) return showErrorToast("성함을 입력해주세요.");
@@ -71,7 +78,7 @@ export default function OrderConfirmPage() {
     try {
       setSubmitting(true);
 
-      // cart → API payload 매핑 (이미 cartSlice.addItem에서 같은 스키마 사용 중)
+      // cart → API payload 매핑
       const items = cartItems.map((it) => ({
         foodId: it.foodId,
         name: it.name,
@@ -82,7 +89,7 @@ export default function OrderConfirmPage() {
 
       const payload = {
         boothId: Number(boothId),
-        tableNo: tableId,
+        tableNo, // 세션 또는 URL에서 가져온 테이블 번호
         items,
         payment: {
           payerName: name.trim(),
@@ -95,6 +102,11 @@ export default function OrderConfirmPage() {
       if (!orderId) {
         throw new Error("주문번호가 응답에 없습니다.");
       }
+
+      // ✅ 주문 생성 성공 → Redux에 orderId 저장 (테이블별 다중 저장)
+      dispatch(
+        addOrderId({ tableId: Number(tableId), orderId: Number(orderId) })
+      );
 
       showSuccessToast(`${name}님의 주문요청이 관리자에게 전달되었습니다.`);
       navigate(paths.pending(boothId, tableId, orderId));

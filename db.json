@@ -615,6 +615,136 @@
         "payerName": "ㅇㅁㄴ",
         "amount": 2313123
       }
+    },
+    {
+      "id": 140,
+      "orderId": 140,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000140",
+      "totalAmount": 323,
+      "createdAt": "2025-08-12T02:06:49.013Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "2342",
+        "amount": 323
+      }
+    },
+    {
+      "id": 141,
+      "orderId": 141,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000141",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:10:34.433Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 142,
+      "orderId": 142,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000142",
+      "totalAmount": 323,
+      "createdAt": "2025-08-12T02:14:02.099Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "321",
+        "amount": 323
+      }
+    },
+    {
+      "id": 143,
+      "orderId": 143,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000143",
+      "totalAmount": 2313123,
+      "createdAt": "2025-08-12T02:19:29.459Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 10,
+          "name": "ㅁㅇㅁㄴㅇㅁ",
+          "price": 2313123,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "123",
+        "amount": 2313123
+      }
+    },
+    {
+      "id": 144,
+      "orderId": 144,
+      "boothId": 2,
+      "tableId": 10,
+      "visitId": 23,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000144",
+      "totalAmount": 1292,
+      "createdAt": "2025-08-12T02:19:48.622Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 9,
+          "name": "ㅇㄴㅁ",
+          "price": 323,
+          "imageUrl": "",
+          "quantity": 4
+        }
+      ],
+      "payment": {
+        "payerName": "432234",
+        "amount": 1292
+      }
     }
   ],
   "menuMetrics": [
