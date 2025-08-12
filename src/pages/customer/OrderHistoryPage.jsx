@@ -11,8 +11,8 @@ import { getOrderDetail } from "../../api/customerApi.js";
 
 // 상태 라벨/색상 매핑
 const STATUS_MAP = {
-  PENDING: { label: "진행 중", color: "#F59E0B" },
-  APPROVED: { label: "완료",   color: "#10B981" },
+  PENDING: { label: "승인 대기 중", color: "#F59E0B" },
+  APPROVED: { label: "승인 완료",   color: "#10B981" },
   REJECTED: { label: "취소",   color: "#EF4444" },
 };
 
@@ -134,7 +134,7 @@ export default function OrderHistoryPage() {
       ) : (
         <List>
           {orders.map((o) => {
-            const stat = STATUS_MAP[o.status] || STATUS_MAP.PENDING;
+            const stat = STATUS_MAP[o.customerOrder.status] || STATUS_MAP.PENDING;
             const qty = Array.isArray(o.orderItems) ? o.orderItems.length : 0;
             return (
               <Card key={o.orderId}>

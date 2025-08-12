@@ -43,8 +43,7 @@ export default function OrderHistoryModal({
   const sorted = useMemo(
     () =>
       [...orders].sort(
-        (a, b) =>
-          +new Date(b?.createdAt || 0) - +new Date(a?.createdAt || 0)
+        (a, b) => +new Date(b?.createdAt || 0) - +new Date(a?.createdAt || 0)
       ),
     [orders]
   );
@@ -91,7 +90,7 @@ export default function OrderHistoryModal({
         qty: it.quantity ?? 0,
       })),
       customerName: o?.paymentInfo?.payer_name || "-",
-      addAmount:  "-",
+      addAmount: "-",
       totalAmount: o?.paymentInfo.amount,
       onApprove: () => handleSetStatus(id, "APPROVED"),
       onReject: () => handleSetStatus(id, "REJECTED"),
