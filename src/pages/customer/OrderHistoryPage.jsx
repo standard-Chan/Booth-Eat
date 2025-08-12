@@ -11,9 +11,10 @@ import { getOrderDetail } from "../../api/customerApi.js";
 
 // 상태 라벨/색상 매핑
 const STATUS_MAP = {
-  PENDING: { label: "승인 대기 중", color: "#F59E0B" },
-  APPROVED: { label: "승인 완료",   color: "#10B981" },
+  PENDING: { label: "확인 대기 중", color: "#F59E0B" },
+  APPROVED: { label: "승인 완료 (요리중)",   color: "#3B82F6" },
   REJECTED: { label: "취소",   color: "#EF4444" },
+  FINISHED: { label: "처리 완료", color: "#10B981"}
 };
 
 export default function OrderHistoryPage() {

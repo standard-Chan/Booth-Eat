@@ -76,13 +76,14 @@ export default function OrderHistoryModal({
 
   // ★ API 응답 형태에 맞춰 매핑 (플랫 + items + payment)
   const toCardProps = (o) => {
-    const status = (o?.status || "").toUpperCase(); // PENDING | APPROVED | REJECTED | FINISHED
+    const status = (o?.customerOrder.status || "").toUpperCase(); // PENDING | APPROVED | REJECTED | FINISHED
     const amount = o?.payment?.amount ?? o?.totalAmount ?? 0;
-    const id = o?.orderId ?? o?.id;
+    const id = o?.customerOrder.order_id ?? o?.id;
 
     const result = {
       tableNo: tableNumber,
       timeText: `${fmtYMD(o?.createdAt)} ${fmtHM(o?.createdAt)}`,
+      orderId : id,
       active: true,
       orderStatus: status,
       items: (o?.orderItems || []).map((it) => ({
@@ -97,9 +98,9 @@ export default function OrderHistoryModal({
       onClear: () => handleSetStatus(id, "FINISHED"),
       onReceiptClick: () => {},
     };
-    console.log(result);
     return result;
   };
+
 
   return (
     <Modal open={open} title={`테이블 ${tableNumber}`} onClose={onClose}>
@@ -143,3 +144,30 @@ const List = styled.div`
 `;
 
 const CardWrap = styled.div``;
+
+
+/**
+ * 
+ * {
+    "customerOrder": {
+        "order_id": 5,
+        "table_id": 1,
+        "visit_id": 1,
+        "status": "PENDING",
+        "order_code": "BE-20250812-000005",
+        "total_amount": 15000,
+        "created_at": "2025-08-12T06:38:46.370645Z",
+        "approved_at": null
+    },
+    "orderItems": [
+        {
+            "name": "치즈핫도그",
+            "quantity": 3
+        }
+    ],
+    "paymentInfo": {
+        "payer_name": "ㅇㄴㅇㄴㅁ",
+        "amount": 15000
+    }
+}
+ */
