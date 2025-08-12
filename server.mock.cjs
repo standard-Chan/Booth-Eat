@@ -297,8 +297,8 @@ server.get(apiPaths('/api/manager/booths/:boothId/stats/menu-sales'), (req, res)
 // ================================
 server.use(jsonServer.rewriter({
   // ----- 공개(구매자) -----
-  '/api/booths/menus/:boothId': '/menus?boothId=:boothId',
-  '/api/booth/menus/:boothId/:menuItemId': '/menus/:menuItemId',
+  '/api/:boothId/booths/menus': '/menus?boothId=:boothId',
+  '/api/booth/:boothId/menus/:menuItemId': '/menus/:menuItemId',
   '/api/booths/:boothId/account': '/accounts?boothId=:boothId',
   '/api/orders': '/orders',
   '/api/orders/:orderId': '/orders/:orderId',

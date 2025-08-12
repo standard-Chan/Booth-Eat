@@ -23,11 +23,11 @@ const qs = (paramsObj = {}) =>
 export const API_PUBLIC = {
   // 1. 부스 메뉴 목록 조회
   // ⚠️ 스펙: GET /api/booths/menus/{boothId}
-  LIST_MENUS_BY_BOOTH: (boothId) => `/booths/menus/${boothId}`,
+  LIST_MENUS_BY_BOOTH: (boothId) => `/booths/${boothId}/menus`,
 
   // 2. 단일 메뉴 조회
   // ⚠️ 스펙: GET /api/booth/menus/{boothId}/{menuItemId} (booth 단수 주의)
-  GET_MENU_DETAIL: (boothId, menuItemId) => `/booth/menus/${boothId}/${menuItemId}`,
+  GET_MENU_DETAIL: (boothId, menuItemId) => `/booth/${boothId}/menus/${menuItemId}`,
 
   // 3. 부스 계좌 정보 조회
   // GET /api/booths/{boothId}/account
