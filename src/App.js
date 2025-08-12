@@ -1,6 +1,6 @@
 import './App.css';
-import AppRouter from './routes/AppRouter.jsx';
 import AppToast from './components/common/AppToast.jsx';
+import AppRouter from './routes/approuter.jsx';
 
 function App() {
   return (<>
