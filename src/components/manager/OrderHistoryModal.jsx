@@ -81,23 +81,25 @@ export default function OrderHistoryModal({
     const amount = o?.payment?.amount ?? o?.totalAmount ?? 0;
     const id = o?.orderId ?? o?.id;
 
-    return {
+    const result = {
       tableNo: tableNumber,
       timeText: `${fmtYMD(o?.createdAt)} ${fmtHM(o?.createdAt)}`,
       active: true,
       orderStatus: status,
-      items: (o?.items || []).map((it) => ({
+      items: (o?.orderItems || []).map((it) => ({
         name: it.name,
         qty: it.quantity ?? 0,
       })),
-      customerName: o?.payment?.payerName || "-",
-      addAmount: amount,
-      totalAmount: amount,
+      customerName: o?.paymentInfo?.payer_name || "-",
+      addAmount:  "-",
+      totalAmount: o?.paymentInfo.amount,
       onApprove: () => handleSetStatus(id, "APPROVED"),
       onReject: () => handleSetStatus(id, "REJECTED"),
       onClear: () => handleSetStatus(id, "FINISHED"),
       onReceiptClick: () => {},
     };
+    console.log(result);
+    return result;
   };
 
   return (
@@ -107,7 +109,7 @@ export default function OrderHistoryModal({
       {!loading && !error && sorted.length === 0 && (
         <Empty>이 테이블의 주문 이력이 없습니다.</Empty>
       )}
-
+      {console.log(sorted)}
       {!loading && !error && sorted.length > 0 && (
         <List ref={listRef}>
           {sorted.map((o, i) => (

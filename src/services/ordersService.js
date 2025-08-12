@@ -113,6 +113,7 @@ export async function fetchOrderDetails(orderIds) {
 /** 부스 → 카드 목록 로딩 (UI 데이터 형태 유지) */
 export async function loadCards(boothId) {
   const tables = await fetchTables(boothId);
+  console.log(tables);
   const results = [];
 
   for (const t of tables) {

@@ -861,6 +861,32 @@
         "payerName": "213123",
         "amount": 3000
       }
+    },
+    {
+      "id": 149,
+      "orderId": 149,
+      "boothId": 1,
+      "tableId": 1,
+      "visitId": 11,
+      "status": "PENDING",
+      "orderCode": "BE-20250812-000149",
+      "totalAmount": 4500,
+      "createdAt": "2025-08-12T05:50:22.049Z",
+      "approvedAt": null,
+      "tableNo": 1,
+      "items": [
+        {
+          "foodId": 4,
+          "name": "테스트핫도그-5387",
+          "price": 4500,
+          "imageUrl": "",
+          "quantity": 1
+        }
+      ],
+      "payment": {
+        "payerName": "ㄴㅇㅁ",
+        "amount": 4500
+      }
     }
   ],
   "menuMetrics": [

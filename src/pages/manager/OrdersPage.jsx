@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import orderApi, {
+import {
   getTablesByBooth,
   getLatestVisitOrderIds,
   getOrderDetail,
@@ -25,14 +25,31 @@ function formatTime(ts) {
   return `${hh}:${mm}`;
 }
 
-function byCreatedAtAsc(a, b) {
-  return +new Date(a?.createdAt || 0) - +new Date(b?.createdAt || 0);
+/** ── 응답 스키마 전용 getter ───────────────────────────── */
+function getCO(o) { return o?.customerOrder || {}; }
+function getPI(o) { return o?.paymentInfo || {}; }
+
+function getCreatedAt(o) {
+  return getCO(o).created_at ?? null;
 }
-function byCreatedAtDesc(a, b) {
-  return +new Date(b?.createdAt || 0) - +new Date(a?.createdAt || 0);
+function getStatus(o) {
+  return (getCO(o).status ?? "PENDING").toUpperCase();
+}
+function getAmount(o) {
+  // 원칙: paymentInfo.amount 사용. (없으면 보조로 total_amount)
+  return getPI(o).amount ?? getCO(o).total_amount ?? 0;
+}
+function getPayerName(o) {
+  return getPI(o).payer_name ?? "";
+}
+function getItems(o) {
+  return Array.isArray(o?.orderItems) ? o.orderItems : [];
+}
+function getOrderId(o) {
+  return getCO(o).order_id ?? o?.orderId ?? o?.id ?? null;
 }
 
-/** 같은 visit의 여러 주문을 카드 하나로 합치기 */
+/** 같은 visit의 여러 주문을 카드 하나로 합치기 (응답 스키마 기준) */
 function combineOrdersForCard(table, orders = []) {
   if (!table?.active || !orders.length) {
     return {
@@ -47,29 +64,28 @@ function combineOrdersForCard(table, orders = []) {
     };
   }
 
-  // 시간: 가장 처음 주문 시각
-  const sortedAsc = [...orders].sort(byCreatedAtAsc);
-  const first = sortedAsc[0];
-  const firstAmount = (first?.payment?.amount ?? first?.totalAmount ?? 0) || 0;
-
-  // 상태/액션: 가장 최근 주문 기준
-  const latest = [...orders].sort(byCreatedAtDesc)[0];
-  const latestStatus = (latest?.status || "PENDING").toUpperCase();
-
-  // 총 금액 합계
-  const totalAmount = orders.reduce(
-    (sum, o) => sum + ((o?.payment?.amount ?? o?.totalAmount ?? 0) || 0),
-    0
+  // created_at 기준 정렬
+  const byAsc = [...orders].sort(
+    (a, b) => +new Date(getCreatedAt(a) || 0) - +new Date(getCreatedAt(b) || 0)
+  );
+  const byDesc = [...orders].sort(
+    (a, b) => +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0)
   );
 
-  // 추가 주문 금액(첫 주문 제외 합)
-  const addAmount = Math.max(totalAmount - firstAmount, 0);
+  const first = byAsc[0];
+  const latest = byDesc[0];
 
-  // 아이템 병합 (이름 기준)
+  // ✅ 총 금액 = 모든 주문의 paymentInfo.amount 합
+  const totalAmount = orders.reduce((sum, o) => sum + (getAmount(o) || 0), 0);
+
+  // ✅ 추가 주문 금액 = "가장 최근 주문" 1건의 paymentInfo.amount
+  const addAmount = getAmount(latest) || 0;
+
+  // 아이템 병합 (이름 기준, orderItems만 사용)
   const itemMap = new Map();
   orders.forEach((o) => {
-    (o?.items || []).forEach((it) => {
-      const key = it.name ?? `${it.foodId}-${it.name}`;
+    getItems(o).forEach((it) => {
+      const key = it.name ?? `${it.name}`;
       const prev = itemMap.get(key) || { name: it.name, qty: 0 };
       prev.qty += it.quantity ?? 0;
       itemMap.set(key, prev);
@@ -77,27 +93,25 @@ function combineOrdersForCard(table, orders = []) {
   });
   const mergedItems = Array.from(itemMap.values());
 
-  // 주문자 이름: 최신 결제 정보 기준 (없으면 "-")
-  const customerName =
-    latest?.payment?.payerName ??
-    first?.payment?.payerName ??
-    "";
+  const customerName = getPayerName(latest) || getPayerName(first) || "-";
 
   return {
     tableNo: table.tableNumber,
-    timeText: formatTime(first?.createdAt),
+    timeText: formatTime(getCreatedAt(first)),
     active: true,
-    orderStatus: latestStatus, // PENDING | APPROVED | REJECTED | FINISHED
+    orderStatus: getStatus(latest), // PENDING | APPROVED | REJECTED | FINISHED
     items: mergedItems,
-    customerName: customerName || "-",
-    addAmount,
-    totalAmount,
+    customerName,
+    addAmount,    // 최신 주문 금액
+    totalAmount,  // 모든 주문 합계
   };
 }
 
-/* 가장 최근 PENDING 주문 찾아서 반환 */
+/* 가장 최근 PENDING 주문 찾아서 반환 (응답 스키마 기준) */
 function pickLatestPending(orders = []) {
-  return [...orders].filter((o) => (o?.status || "").toUpperCase() === "PENDING").sort(byCreatedAtDesc)[0];
+  return [...orders]
+    .filter((o) => getStatus(o) === "PENDING")
+    .sort((a, b) => +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0))[0];
 }
 
 /* ========== component ========== */
@@ -142,7 +156,8 @@ export default function ManagerOrderPage() {
           const details = await Promise.all(
             ids.map(async (oid) => {
               try {
-                return await getOrderDetail(oid); // 플랫 구조
+                // 응답 포맷: { customerOrder, orderItems[], paymentInfo }
+                return await getOrderDetail(oid);
               } catch {
                 return null;
               }
@@ -154,7 +169,9 @@ export default function ManagerOrderPage() {
 
       // 상태 저장
       const map = {};
-      detailPairs.forEach(({ tableId, details }) => (map[tableId] = details));
+      detailPairs.forEach(({ tableId, details }) => {
+        map[tableId] = details;
+      });
       setOrdersByTable(map);
     } finally {
       setLoading(false);
@@ -171,8 +188,9 @@ export default function ManagerOrderPage() {
   const handleApprove = async (tableId) => {
     const list = ordersByTable[tableId] || [];
     const target = pickLatestPending(list);
-    if (!target?.orderId && !target?.id) return;
-    await approveOrder(target.orderId ?? target.id);
+    const id = getOrderId(target);
+    if (!id) return;
+    await approveOrder(id);
     setRefreshKey((v) => v + 1);
   };
 
@@ -180,8 +198,9 @@ export default function ManagerOrderPage() {
   const handleReject = async (tableId) => {
     const list = ordersByTable[tableId] || [];
     const target = pickLatestPending(list);
-    if (!target?.orderId && !target?.id) return;
-    await rejectOrder(target.orderId ?? target.id);
+    const id = getOrderId(target);
+    if (!id) return;
+    await rejectOrder(id);
     setRefreshKey((v) => v + 1);
   };
 
@@ -196,9 +215,12 @@ export default function ManagerOrderPage() {
   // (옵션) 최신 주문 FINISHED 처리 — 필요 시 사용
   const handleFinish = async (tableId) => {
     const list = ordersByTable[tableId] || [];
-    const latest = [...list].sort(byCreatedAtDesc)[0];
-    if (!latest?.orderId && !latest?.id) return;
-    await setOrderStatus(latest.orderId ?? latest.id, "FINISHED");
+    const latest = [...list].sort(
+      (a, b) => +new Date(getCreatedAt(b) || 0) - +new Date(getCreatedAt(a) || 0)
+    )[0];
+    const id = getOrderId(latest);
+    if (!id) return;
+    await setOrderStatus(id, "FINISHED");
     setRefreshKey((v) => v + 1);
   };
 
@@ -249,6 +271,7 @@ export default function ManagerOrderPage() {
               onReject={() => handleReject(table.tableId)}
               onClear={() => handleClear(table.tableId)}
               onReceiptClick={() => handleReceiptClick(table.tableId)}
+              isHistory={false}
             />
           ))}
         </Grid>

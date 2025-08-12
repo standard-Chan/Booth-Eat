@@ -15,6 +15,7 @@ export default function OrderCard({
   onReject,
   onClear,
   onReceiptClick,
+  isHistory = true,
 }) {
   const isPending = active && orderStatus === "PENDING";
   const isApproved = active && orderStatus === "APPROVED";
@@ -23,6 +24,7 @@ export default function OrderCard({
 
   const [checks, setChecks] = useState({});
   useEffect(() => {
+    console.log(items);
     const init = {};
     items.forEach((it, idx) => (init[idx] = false));
     setChecks(init);
@@ -36,9 +38,17 @@ export default function OrderCard({
         <Title>
           테이블 {tableNo} {timeText && <Time>{timeText}</Time>}
         </Title>
-        <ReceiptIcon role="button" onClick={onReceiptClick} title="영수증 보기">
-          🧾
-        </ReceiptIcon>
+        {isHistory ? (
+          <></>
+        ) : (
+          <ReceiptIcon
+            role="button"
+            onClick={onReceiptClick}
+            title="영수증 보기"
+          >
+            🧾
+          </ReceiptIcon>
+        )}
       </CardHead>
 
       {!active ? (
@@ -52,7 +62,9 @@ export default function OrderCard({
               <ItemRow key={`${it.name}-${i}`} onClick={() => toggleCheck(i)}>
                 <ItemName>{it.name}</ItemName>
                 <ItemQty>{it.qty}</ItemQty>
-                <ItemCheck $on={!!checks[i]}>{checks[i] ? "✓" : ""}</ItemCheck>
+                <ItemCheck $on={!!checks[i]}>
+                  {checks[i] ? "✓" : "□"} {/* 체크 전에는 빈 사각형 표시 */}
+                </ItemCheck>
               </ItemRow>
             ))}
           </ItemList>
@@ -94,7 +106,6 @@ export default function OrderCard({
     </Card>
   );
 }
-
 
 /* ===== styles ===== */
 const Card = styled.article`
@@ -168,7 +179,7 @@ const ItemCheck = styled.div`
   justify-self: end;
   font-size: 20px;
   font-weight: 900;
-  color: ${({ $on }) => ($on ? "#f05454" : "#1d2230")};
+  color: ${({ $on }) => ($on ? "#f05454" : "#bbb")}; /* 체크 전에는 회색 */
 `;
 const Meta = styled.div`
   margin-top: auto;

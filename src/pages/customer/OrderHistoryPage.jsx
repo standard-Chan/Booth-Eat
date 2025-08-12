@@ -135,11 +135,11 @@ export default function OrderHistoryPage() {
         <List>
           {orders.map((o) => {
             const stat = STATUS_MAP[o.status] || STATUS_MAP.PENDING;
-            const qty = Array.isArray(o.items) ? o.items.length : 0;
+            const qty = Array.isArray(o.orderItems) ? o.orderItems.length : 0;
             return (
               <Card key={o.orderId}>
                 <TopRow>
-                  <OrderTitle>{formatDate(o.createdAt)} 주문</OrderTitle>
+                  <OrderTitle>{formatDate(o.customerOrder.created_at)} 주문</OrderTitle>
                   <Status>
                     <Dot style={{ background: stat.color }} />
                     <StatusText style={{ color: stat.color }}>{stat.label}</StatusText>
@@ -151,7 +151,7 @@ export default function OrderHistoryPage() {
                 <MetaRow>
                   <MetaCol>
                     <MetaLabel>총 금액</MetaLabel>
-                    <MetaStrong>{(o.payment.amount || 0).toLocaleString()}원</MetaStrong>
+                    <MetaStrong>{(o.paymentInfo.amount || 0).toLocaleString()}원</MetaStrong>
                   </MetaCol>
 
                   <MetaColRight>
