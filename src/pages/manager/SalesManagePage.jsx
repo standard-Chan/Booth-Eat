@@ -108,11 +108,11 @@ export default function SalesManagePage() {
       const items = Array.isArray(t?.items) ? t.items : [];
       const totalAmount = items.reduce((s, it) => s + Number(it.amount || 0), 0);
       const totalQty = items.reduce((s, it) => s + Number(it.qty || 0), 0);
-
+      
       setSummary({
         totalSales: totalAmount,
         totalQty,
-        orderNumbers: Number(t?.totalOrders ?? 0), // 없으면 0
+        orderNumbers: Number(items.length ?? 0), // 없으면 0
         peakHour: t?.peakHour ?? null,
       });
 
