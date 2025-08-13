@@ -214,12 +214,13 @@ export default function ManagerReportsPage() {
   const [todayTotals, setTodayTotals] = useState({ totalSalse: 0, orderNumbers: 0 });
   const [visitStats, setVisitStats] = useState({ list: [], avg: 0, median: 0, p90: 0 });
 
-  // OpenAI 키
+  // OpenAI 키: 최초 1회 입력 후 localStorage에 저장되면 입력창 숨김
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("OPENAI_API_KEY") || "");
   useEffect(() => { localStorage.setItem("OPENAI_API_KEY", apiKey || ""); }, [apiKey]);
   useEffect(() => {
     if (process.env.REACT_APP_OPEN) setApiKey(process.env.REACT_APP_OPEN);
   }, []);
+  const hasKey = Boolean(apiKey);
 
   // ✅ 최근 7일 데이터 로드 (+ 오늘 집계/방문시간)
   useEffect(() => {
@@ -319,13 +320,15 @@ export default function ManagerReportsPage() {
       <PageGrid>
         {/* 상단 제어 */}
         <Row>
-          <Input
-            type="password"
-            placeholder="key 입력"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            autoComplete="off"
-          />
+          {!hasKey && (
+            <Input
+              type="password"
+              placeholder="API Key 입력"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              autoComplete="off"
+            />
+          )}
           {dataError && <Sub style={{ color:"#b91c1c" }}>{dataError}</Sub>}
           {kpis.dates.length > 0 && (
             <Sub>데이터 범위: {kpis.dates[0]} ~ {kpis.dates[kpis.dates.length - 1]}</Sub>
@@ -403,14 +406,9 @@ export default function ManagerReportsPage() {
             <KTable>
               <tbody>
                 <Big>{Math.round(visitStats.avg) || 0} 분</Big>
-                {/* <tr><th>식사 평균</th><td>{Math.round(visitStats.avg) || 0} 분</td></tr> */}
-                {/* <tr><th>중앙값</th><td>{Math.round(visitStats.median) || 0} 분</td></tr>
-                <tr><th>상위 10% (p90)</th><td>{Math.round(visitStats.p90) || 0} 분</td></tr> */}
               </tbody>
             </KTable>
 
-            {/* 미니 분포 스파크바
-            <Sub style={{ marginTop: 10 }}>분포(샘플 {visitStats.list.length}건)</Sub> */}
             <Spark>
               {visitStats.list.slice(0, 24).map((m, i) => (
                 <Bar key={i} h={Math.round((m / visitMax) * 100)} title={`${m}분`} />
