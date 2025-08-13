@@ -287,9 +287,9 @@ export default function ManagerReportsPage() {
             onChange={(e) => setApiKey(e.target.value)}
             autoComplete="off"
           />
-          <Ghost onClick={() => setWeekSales(fabricateWeekFromDay(DAY_SAMPLE_BY_BOOTH))}>
+          {/* <Ghost onClick={() => setWeekSales(fabricateWeekFromDay(DAY_SAMPLE_BY_BOOTH))}>
             샘플 데이터 재생성
-          </Ghost>
+          </Ghost> */}
         </Row>
 
         {/* 요약 카드 */}
