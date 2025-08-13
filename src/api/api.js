@@ -181,3 +181,23 @@ export const API_ADMIN_MANAGER = {
   // GET /api/admin/booths/{boothId}/manager
   GET_MANAGER: (boothId) => `/admin/booths/${boothId}/manager`,
 };
+
+// ---------------------------------------------------------------------
+// 5-1) 통합 통계 (매니저)
+// ---------------------------------------------------------------------
+export const API_MANAGER_STATS_EXT = {
+  // 1. 모든 booth의 특정 날짜 판매량 정보
+  // GET /api/manager/booths/stats/date/{yyyy-MM-dd}
+  GET_ALL_BOOTH_DATE_SALES: (yyyyMMdd) =>
+    `/manager/booths/stats/date/${yyyyMMdd}`,
+
+  // 2. 모든 부스의 특정 날짜의 판매 정보
+  // GET /api/manager/order/stats/date/{yyyy-MM-dd}
+  GET_ALL_BOOTH_ORDER_STATS: (yyyyMMdd) =>
+    `/manager/order/stats/date/${yyyyMMdd}`,
+
+  // 3. 특정 날짜의 모든 visit 시간
+  // GET /api/manager/tableVisit/stats/date/{yyyy-MM-dd}
+  GET_VISIT_TIMES_BY_DATE: (yyyyMMdd) =>
+    `/manager/tableVisit/stats/date/${yyyyMMdd}`,
+};

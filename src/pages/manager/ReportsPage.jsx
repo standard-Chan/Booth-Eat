@@ -5,44 +5,12 @@ import { useParams } from "react-router-dom";
 import AppLayout from "../../components/common/manager/AppLayout.jsx";
 import { callGpt5NanoBrowser } from "../../api/gpt.js";
 
-/* ========= 임시 샘플 (하루치 원본) ========= */
-const DAY_SAMPLE_BY_BOOTH = {
-  "1": [
-    {
-      orderId: 1,
-      boothId: 1,
-      totalAmount: 18000,
-      createdAt: "2025-08-12T16:35:50.782898Z",
-      orderItems: [
-        { menuItemId: 2, name: "치즈핫도그", unitPrice: 7000, quantity: 2, lineAmount: 14000 },
-        { menuItemId: 2, name: "치즈핫도그", unitPrice: 4000, quantity: 1, lineAmount: 4000 },
-      ],
-    },
-  ],
-  "2": [
-    {
-      orderId: 2,
-      boothId: 2,
-      totalAmount: 26000,
-      createdAt: "2025-08-12T17:20:12.000Z",
-      orderItems: [
-        { menuItemId: 10, name: "떡볶이", unitPrice: 6000, quantity: 2, lineAmount: 12000 },
-        { menuItemId: 11, name: "오뎅탕", unitPrice: 7000, quantity: 2, lineAmount: 14000 },
-      ],
-    },
-  ],
-  "3": [
-    {
-      orderId: 3,
-      boothId: 3,
-      totalAmount: 15000,
-      createdAt: "2025-08-12T18:05:00.000Z",
-      orderItems: [
-        { menuItemId: 30, name: "김치볶음밥", unitPrice: 7500, quantity: 2, lineAmount: 15000 },
-      ],
-    },
-  ],
-};
+// ✅ 통합 통계 API
+import {
+  getAllBoothDateSales,
+  getAllBoothOrderStats,
+  getVisitTimesByDate,
+} from "../../api/manager/managerStatsApi.js";
 
 /* ========= 유틸 ========= */
 const KRW = (n = 0) =>
@@ -61,38 +29,42 @@ function getDates7(today = new Date()) {
   return arr;
 }
 function sumBooth(orders = []) { return orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0); }
+const avg = (arr = []) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
+const median = (arr = []) => {
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const percentile = (arr = [], p = 0.9) => {
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a, b) => a - b);
+  const idx = Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1));
+  return s[idx];
+};
 
-/** 하루치 샘플을 기반으로 7일치 임시 데이터 생성 (± 가중치) */
-function fabricateWeekFromDay(daySampleByBooth) {
-  const dates = getDates7();
-  const weights = [0.85, 0.92, 1.05, 0.97, 1.10, 0.88, 1.00];
-  const week = {};
-  dates.forEach((date, idx) => {
-    const w = weights[idx];
-    week[date] = {};
-    Object.entries(daySampleByBooth).forEach(([boothId, orders]) => {
-      const scaled = orders.map((o, i) => ({
-        ...o,
-        orderId: Number(`${idx + 1}${o.orderId}${i}`),
-        createdAt: `${date}T12:00:00.000Z`,
-        totalAmount: Math.round((o.totalAmount || 0) * w),
-        orderItems: (o.orderItems || []).map((it) => ({
-          ...it,
-          quantity: Math.max(1, Math.round(it.quantity * clamp(w + (idx % 2 ? 0.05 : -0.03), 0.7, 1.3))),
-          lineAmount: Math.round(it.lineAmount * w),
-        })),
-      }));
-      week[date][boothId] = scaled;
-    });
-  });
-  return week;
-}
-
-/** KPI 계산 */
+/** KPI 계산 (빈 데이터 안전 처리) */
 function computeKPIs(weekSales, currentBoothId) {
   const dates = Object.keys(weekSales).sort();
+  if (dates.length === 0) {
+    return {
+      dates: [],
+      todayKey: "",
+      ydayKey: "",
+      myToday: 0,
+      myYesterday: 0,
+      changePct: 0,
+      weekAvg: 0,
+      rankToday: 0,
+      totalBooths: 0,
+      todayTotals: [],
+      predicted: 0,
+    };
+  }
+
   const todayKey = dates[dates.length - 1];
-  const ydayKey = dates[dates.length - 2];
+  const ydayKey = dates[dates.length - 2] || dates[0];
+
   const todayTotals = Object.entries(weekSales[todayKey] || {}).map(([bid, arr]) => ({ boothId: bid, total: sumBooth(arr) }));
   todayTotals.sort((a, b) => b.total - a.total);
 
@@ -101,7 +73,7 @@ function computeKPIs(weekSales, currentBoothId) {
   const weekMyTotals = dates.map((d) => sumBooth((weekSales[d] || {})[String(currentBoothId)] || []));
   const weekAvg = weekMyTotals.reduce((a, b) => a + b, 0) / (weekMyTotals.length || 1);
 
-  const rankToday = todayTotals.findIndex((x) => String(x.boothId) === String(currentBoothId)) + 1;
+  const rankToday = todayTotals.findIndex((x) => String(x.boothId) === String(currentBoothId)) + 1 || 0;
   const totalBooths = todayTotals.length;
 
   const last3 = weekMyTotals.slice(-3);
@@ -137,12 +109,18 @@ function buildPrompt(kind, weekSales, boothId, kpis) {
 /* ========= styled ========= */
 const PageGrid = styled.div`display:grid; gap:16px;`;
 
-/* 읽기용 폰트 스택 (Pretendard/Inter/NotoSansKR 우선, 없으면 시스템 폰트) */
+/* 읽기용 폰트 스택 */
 const READING_STACK = `'Pretendard', 'Inter', 'Noto Sans KR', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Helvetica Neue', Arial, sans-serif`;
 
 const SummaryCardGrid = styled.div`
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 12px;
+  @media (max-width: 980px) { grid-template-columns: 1fr; }
+`;
+const ExtraCardGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
   @media (max-width: 980px) { grid-template-columns: 1fr; }
 `;
@@ -193,11 +171,9 @@ const AiText = styled.div`
   line-height: 1.75;
   letter-spacing: 0.1px;
   color: #111827;
-  white-space: pre-wrap;  /* GPT 개행 유지 */
-  word-break: keep-all;   /* 한국어 단어 단위 */
-  max-width: 72ch;        /* 읽기 폭 제한 */
-  
-  /* 서브 요소 정리 */
+  white-space: pre-wrap;
+  word-break: keep-all;
+  max-width: 72ch;
   b, strong { font-weight: 800; }
   i, em { color: #374151; }
   p { margin: 0 0 10px; }
@@ -229,24 +205,84 @@ export default function ManagerReportsPage() {
   const { boothId: boothIdParam } = useParams();
   const boothId = String(boothIdParam || "1");
 
-  const [weekSales, setWeekSales] = useState(() => fabricateWeekFromDay(DAY_SAMPLE_BY_BOOTH));
+  // ✅ API로 채울 주간 데이터 (날짜별 → { boothId: [orders...] })
+  const [weekSales, setWeekSales] = useState({});
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState("");
 
-  // API 키 (초기 하드코딩값 주입되도록, 무한 재렌더 방지)
+  // 전체 합산(오늘) & 방문시간 통계(오늘)
+  const [todayTotals, setTodayTotals] = useState({ totalSalse: 0, orderNumbers: 0 });
+  const [visitStats, setVisitStats] = useState({ list: [], avg: 0, median: 0, p90: 0 });
+
+  // OpenAI 키
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("OPENAI_API_KEY") || "");
   useEffect(() => { localStorage.setItem("OPENAI_API_KEY", apiKey || ""); }, [apiKey]);
   useEffect(() => {
-    if (process.env.REACT_APP_OPEN) {
-      setApiKey(process.env.REACT_APP_OPEN);
-    }
+    if (process.env.REACT_APP_OPEN) setApiKey(process.env.REACT_APP_OPEN);
+  }, []);
+
+  // ✅ 최근 7일 데이터 로드 (+ 오늘 집계/방문시간)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setDataLoading(true);
+      setDataError("");
+      try {
+        const dates = getDates7();
+        // 7일치 병렬 호출
+        const results = await Promise.all(dates.map((d) => getAllBoothDateSales(d)));
+        // 정상화: boothId 키는 문자열로 강제
+        const normalized = {};
+        dates.forEach((date, idx) => {
+          const byBooth = results[idx] || {};
+          const dayObj = {};
+          Object.entries(byBooth).forEach(([bid, arr]) => {
+            dayObj[String(bid)] = Array.isArray(arr) ? arr : [];
+          });
+          normalized[date] = dayObj;
+        });
+        if (!alive) return;
+        setWeekSales(normalized);
+
+        // 가장 최근 날짜(오늘 기준)로 ②/③ 호출
+        const latestDate = dates[dates.length - 1];
+        const [totals, visits] = await Promise.all([
+          getAllBoothOrderStats(latestDate),
+          getVisitTimesByDate(latestDate),
+        ]);
+
+        if (!alive) return;
+
+        const list = Array.isArray(visits)
+          ? visits.map((n) => Number(n) || 0).filter((n) => n >= 0)
+          : [];
+
+        setTodayTotals(totals || { totalSalse: 0, orderNumbers: 0 });
+        setVisitStats({
+          list,
+          avg: avg(list),
+          median: median(list),
+          p90: percentile(list, 0.9),
+        });
+      } catch (e) {
+        if (alive) setDataError(e?.message || "주간/집계 데이터를 불러오지 못했습니다.");
+      } finally {
+        if (alive) setDataLoading(false);
+      }
+    })();
+    return () => { alive = false; };
   }, []);
 
   const kpis = useMemo(() => computeKPIs(weekSales, boothId), [weekSales, boothId]);
+
+  // GPT 호출 상태
   const [loading, setLoading] = useState(false);
   const [openIdx, setOpenIdx] = useState(-1);
   const [answers, setAnswers] = useState({}); // kind -> text
   const [error, setError] = useState("");
 
   const weekRows = useMemo(() => {
+    if (!kpis.dates.length) return [];
     return kpis.dates.map((d) => {
       const mine = sumBooth((weekSales[d] || {})[boothId] || []);
       const allTotals = Object.values(weekSales[d] || {}).map((arr) => sumBooth(arr));
@@ -258,6 +294,7 @@ export default function ManagerReportsPage() {
 
   async function run(kind, idxToOpen) {
     if (!apiKey) { setError("OpenAI API 키를 입력해주세요."); return; }
+    if (!kpis.dates.length) { setError("데이터가 아직 준비되지 않았습니다."); return; }
     setError("");
     setOpenIdx(idxToOpen);
     setLoading(true);
@@ -273,10 +310,12 @@ export default function ManagerReportsPage() {
   }
 
   const deltaPos = kpis.changePct >= 0;
+  const totalSalesAll = (todayTotals && (todayTotals.totalSalse ?? todayTotals.totalSales)) || 0;
+  const visitMax = Math.max(...visitStats.list, 1);
 
   return (
     <AppLayout title="비즈니스 리포트">
-      {loading && (<Backdrop><Spinner /></Backdrop>)}
+      {(loading || dataLoading) && (<Backdrop><Spinner /></Backdrop>)}
       <PageGrid>
         {/* 상단 제어 */}
         <Row>
@@ -287,17 +326,25 @@ export default function ManagerReportsPage() {
             onChange={(e) => setApiKey(e.target.value)}
             autoComplete="off"
           />
-          {/* <Ghost onClick={() => setWeekSales(fabricateWeekFromDay(DAY_SAMPLE_BY_BOOTH))}>
-            샘플 데이터 재생성
-          </Ghost> */}
+          {dataError && <Sub style={{ color:"#b91c1c" }}>{dataError}</Sub>}
+          {kpis.dates.length > 0 && (
+            <Sub>데이터 범위: {kpis.dates[0]} ~ {kpis.dates[kpis.dates.length - 1]}</Sub>
+          )}
         </Row>
 
-        {/* 요약 카드 */}
+        {/* 요약 카드 (내 부스 중심) */}
         <SummaryCardGrid>
           <Card>
             <Title>매출 요약</Title>
-            <Sub>오늘은 어제보다 <b>{fmtPct(kpis.changePct)}</b> {deltaPos ? "상승" : "하락"}했어요.</Sub>
-            <Big>{KRW(kpis.myToday)} <Delta pos={deltaPos}>{fmtPct(kpis.changePct)}</Delta></Big>
+            <Sub>
+              {kpis.dates.length
+                ? <>오늘은 어제보다 <b>{fmtPct(kpis.changePct)}</b> {deltaPos ? "상승" : "하락"}했어요.</>
+                : "데이터 로딩 중 또는 데이터가 없습니다."
+              }
+            </Sub>
+            <Big>
+              {KRW(kpis.myToday)} {kpis.dates.length ? <Delta pos={deltaPos}>{fmtPct(kpis.changePct)}</Delta> : null}
+            </Big>
 
             <Sub style={{ marginTop: 10 }}>최근 7일 매출 (내 부스)</Sub>
             <Spark>
@@ -326,7 +373,7 @@ export default function ManagerReportsPage() {
             <Sub style={{ marginTop: 10 }}>오늘 전체 부스 매출 TOP</Sub>
             <KTable>
               <tbody>
-                {kpis.todayTotals.slice(0, 5).map((r, i) => (
+                {(kpis.todayTotals || []).slice(0, 5).map((r, i) => (
                   <tr key={r.boothId}>
                     <th>#{i + 1} 부스 {r.boothId}</th>
                     <td>{KRW(r.total)}</td>
@@ -336,6 +383,41 @@ export default function ManagerReportsPage() {
             </KTable>
           </Card>
         </SummaryCardGrid>
+
+        {/* 추가 카드 (전체 합산 & 방문시간) */}
+        <ExtraCardGrid>
+          <Card>
+            <Title>오늘 전체 합산 (모든 부스)</Title>
+            <Sub>모든 부스의 총 매출/주문수</Sub>
+            <Big>{KRW(totalSalesAll)}</Big>
+            <KTable>
+              <tbody>
+                <tr><th>총 주문 수</th><td>{(todayTotals?.orderNumbers || 0).toLocaleString("ko-KR")} 건</td></tr>
+              </tbody>
+            </KTable>
+          </Card>
+
+          <Card>
+            <Title>오늘 식사 시간 평균 (분)</Title>
+            <Sub>주문한 시간 ~ 식사를 끝낸 시간</Sub>
+            <KTable>
+              <tbody>
+                <Big>{Math.round(visitStats.avg) || 0} 분</Big>
+                {/* <tr><th>식사 평균</th><td>{Math.round(visitStats.avg) || 0} 분</td></tr> */}
+                {/* <tr><th>중앙값</th><td>{Math.round(visitStats.median) || 0} 분</td></tr>
+                <tr><th>상위 10% (p90)</th><td>{Math.round(visitStats.p90) || 0} 분</td></tr> */}
+              </tbody>
+            </KTable>
+
+            {/* 미니 분포 스파크바
+            <Sub style={{ marginTop: 10 }}>분포(샘플 {visitStats.list.length}건)</Sub> */}
+            <Spark>
+              {visitStats.list.slice(0, 24).map((m, i) => (
+                <Bar key={i} h={Math.round((m / visitMax) * 100)} title={`${m}분`} />
+              ))}
+            </Spark>
+          </Card>
+        </ExtraCardGrid>
 
         {/* AI Recommendations */}
         <div>
