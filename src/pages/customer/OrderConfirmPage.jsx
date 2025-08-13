@@ -19,7 +19,7 @@ export default function OrderConfirmPage() {
   const dispatch = useDispatch();
 
   const totalAmount = useSelector(selectCartTotalAmount);
-  const cartItems = useSelector(selectCartItems); // 없으면: (state) => state.cart.items
+  const cartItems = useSelector(selectCartItems);
 
   const [account, setAccount] = useState(null);
   const [accLoading, setAccLoading] = useState(true);
@@ -29,6 +29,13 @@ export default function OrderConfirmPage() {
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  // 복사 배지 UI 상태
+  const [copied, setCopied] = useState(false);
+  const hideCopiedSoon = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
 
   // 계좌정보 API
   useEffect(() => {
@@ -67,6 +74,38 @@ export default function OrderConfirmPage() {
     const n = Number(s);
     return Number.isFinite(n) && n > 0 ? n : Number(tableId) || 1;
   }, [tableId]);
+
+  // 계좌 복사 (은행명 + 계좌번호)
+  const handleCopyAccount = async () => {
+    try {
+      if (!account?.bank || !account?.account) return;
+
+      const text = `${account.bank} ${account.account}`;
+
+      // Clipboard API 우선
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+
+      showSuccessToast("계좌번호가 복사되었습니다.");
+      hideCopiedSoon();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      showErrorToast("복사에 실패했습니다. 길게 눌러 복사해주세요.");
+    }
+  };
 
   const submit = async () => {
     if (!name.trim()) return showErrorToast("성함을 입력해주세요.");
@@ -143,29 +182,48 @@ export default function OrderConfirmPage() {
         {/* 계좌 이체 정보 */}
         <Section>
           <H2>계좌이체</H2>
-          <Helper>
-            아래 계좌번호에 주문자님 성함으로 계좌이체 부탁드립니다.
-          </Helper>
+          <Helper>아래 계좌번호에 주문자님 성함으로 계좌이체 부탁드립니다.</Helper>
 
           {accLoading ? (
             <Skeleton>계좌 정보를 불러오는 중…</Skeleton>
           ) : accError ? (
             <ErrorText>{accError}</ErrorText>
           ) : (
-            <AccountGrid>
-              <Col>
-                <Sub>은행</Sub>
-                <Strong>{account?.bank || "-"}</Strong>
-              </Col>
-              <Col>
-                <Sub>계좌번호</Sub>
-                <Strong>{account?.account || "-"}</Strong>
-              </Col>
-              <Col>
-                <Sub>예금주</Sub>
-                <Strong>{account?.accountHolder || "-"}</Strong>
-              </Col>
-            </AccountGrid>
+            <>
+              <AccountGrid>
+                <Col>
+                  <Sub>은행</Sub>
+                  <Strong>{account?.bank || "-"}</Strong>
+                </Col>
+
+                <Col>
+                  <Sub>계좌번호</Sub>
+                  <AccountRow>
+                    <AccountInline>
+                      <Strong aria-label="계좌번호">{account?.account || "-"}</Strong>
+
+                      {/* 계좌번호 바로 옆 복사 버튼 */}
+                      <CopyBtn
+                        type="button"
+                        onClick={handleCopyAccount}
+                        disabled={!account?.bank || !account?.account}
+                        aria-label="은행명과 계좌번호 복사"
+                        title="계좌번호 복사"
+                      >
+                        📋
+                      </CopyBtn>
+
+                      {copied && <CopiedBadge>복사됨</CopiedBadge>}
+                    </AccountInline>
+                  </AccountRow>
+                </Col>
+
+                <Col>
+                  <Sub>예금주</Sub>
+                  <Strong>{account?.accountHolder || "-"}</Strong>
+                </Col>
+              </AccountGrid>
+            </>
           )}
         </Section>
 
@@ -193,7 +251,7 @@ export default function OrderConfirmPage() {
             />
           </InputBox>
 
-          <Agree onClick={() => setAgree(!agree)}>
+          <Agree type="button" onClick={() => setAgree(!agree)}>
             <Check $on={agree}>{agree ? "✓" : ""}</Check>
             <span>개인정보 수집 이용 동의</span>
           </Agree>
@@ -272,6 +330,10 @@ const AccountGrid = styled.div`
   padding: 12px 0;
   border-top: 1px solid #efe8e2;
   border-bottom: 1px solid #efe8e2;
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
 `;
 const Col = styled.div``;
 const Sub = styled.div`
@@ -282,6 +344,56 @@ const Sub = styled.div`
 const Strong = styled.div`
   font-size: 16px;
   font-weight: 700;
+  color: #523d33;
+`;
+
+/* 계좌번호 감싸는 행 - 전체 행은 block로 두고 내부는 inline-flex로 정렬 */
+const AccountRow = styled.div`
+  display: block;
+`;
+
+/* 계좌번호 + 복사 버튼 + 배지 를 "한 줄"에 자연스럽게 */
+const AccountInline = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;             /* 번호와 버튼 사이 살짝 띄움 */
+  flex-wrap: wrap;      /* 모바일에서 줄바꿈 허용 */
+`;
+
+/* 복사 버튼 - 텍스트 라인과 어울리는 미니 버튼 */
+const CopyBtn = styled.button`
+  border: none;
+  background: transparent;
+  background-color: #f8f4de;
+  cursor: pointer;
+  font-size: 16px;      /* 아이콘 크기 */
+  padding: 2px 6px;     /* 작고 가벼운 터치 영역 */
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f2f2f2;
+  }
+  &:active {
+    transform: translateY(0.5px);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+/* 복사됨 배지 */
+const CopiedBadge = styled.span`
+  font-size: 12px;
+  font-weight: 700;
+  color: #10b981;
+  background: #e6fbf3;
+  border: 1px solid #a7f3d0;
+  padding: 2px 6px;
+  border-radius: 999px;
+  line-height: 1;
 `;
 
 /* ▼ 입력 영역 */
