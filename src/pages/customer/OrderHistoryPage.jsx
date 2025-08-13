@@ -8,21 +8,20 @@ import { paths } from "../../routes/paths.js";
 import { selectOrderIdsByTable } from "../../store/orderIdsSlice.js";
 import { getOrderDetail } from "../../api/customerApi.js";
 
-
 // 상태 라벨/색상 매핑
 const STATUS_MAP = {
   PENDING: { label: "확인 대기 중", color: "#F59E0B" },
-  APPROVED: { label: "승인 완료 (요리중)",   color: "#3B82F6" },
-  REJECTED: { label: "취소",   color: "#EF4444" },
-  FINISHED: { label: "처리 완료", color: "#10B981"}
+  APPROVED: { label: "승인 완료 (요리중)", color: "#3B82F6" },
+  REJECTED: { label: "취소", color: "#EF4444" },
+  FINISHED: { label: "처리 완료", color: "#10B981" },
 };
 
 export default function OrderHistoryPage() {
   const { boothId, tableId } = useParams();
   const navigate = useNavigate();
 
-  // ✅ shallowEqual로 값 동일하면 재렌더/재계산 방지
-  const orderIds = useSelector(
+  // Redux에서 가져오는 값
+  const reduxOrderIds = useSelector(
     selectOrderIdsByTable(Number(tableId)),
     shallowEqual
   );
@@ -30,6 +29,7 @@ export default function OrderHistoryPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [orderIds, setOrderIds] = useState([]);
 
   const goMenu = () => navigate(paths.menu(boothId, tableId));
 
@@ -43,12 +43,38 @@ export default function OrderHistoryPage() {
     return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
   };
 
+  // ✅ localStorage에서 불러오기
+  useEffect(() => {
+    const saved = localStorage.getItem(`orderIds_table_${tableId}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setOrderIds(parsed);
+        }
+      } catch {
+        console.warn("저장된 orderIds 파싱 실패");
+      }
+    }
+  }, [tableId]);
+
+  // ✅ Redux에서 값이 바뀌면 localStorage + state에 반영
+  useEffect(() => {
+    if (reduxOrderIds && reduxOrderIds.length > 0) {
+      const unique = Array.from(
+        new Set(reduxOrderIds.map((n) => Number(n)).filter(Number.isFinite))
+      );
+      setOrderIds(unique);
+      localStorage.setItem(
+        `orderIds_table_${tableId}`,
+        JSON.stringify(unique)
+      );
+    }
+  }, [reduxOrderIds, tableId]);
+
   // 숫자 변환 + NaN 제거 + 중복 제거
   const uniqueOrderIds = useMemo(() => {
-    const arr = (orderIds || [])
-      .map((n) => Number(n))
-      .filter((n) => Number.isFinite(n));
-    return Array.from(new Set(arr));
+    return Array.from(new Set(orderIds.map((n) => Number(n)).filter(Number.isFinite)));
   }, [orderIds]);
 
   // ✅ 안정적인 문자열 키(정렬 후 join) — useEffect 의존성으로 사용
@@ -63,7 +89,6 @@ export default function OrderHistoryPage() {
 
     async function fetchAll() {
       if (!idsKey) {
-        // 주문 없음
         if (!canceled) {
           setOrders([]);
           setError(null);
@@ -75,15 +100,18 @@ export default function OrderHistoryPage() {
       setError(null);
 
       try {
-        // idsKey를 다시 배열로 복원
         const ids = idsKey.split(",").map((s) => Number(s));
-        const results = await Promise.allSettled(ids.map((id) => getOrderDetail(id)));
+        const results = await Promise.allSettled(
+          ids.map((id) => getOrderDetail(id))
+        );
 
         const ok = results
           .filter((r) => r.status === "fulfilled" && r.value)
           .map((r) => r.value);
 
-        ok.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        ok.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
 
         if (!canceled) {
           setOrders(ok);
@@ -95,7 +123,6 @@ export default function OrderHistoryPage() {
         if (!canceled) {
           setOrders([]);
           setError("주문 내역을 불러오는 중 오류가 발생했습니다.");
-          // eslint-disable-next-line no-console
           console.error(e);
         }
       } finally {
@@ -107,7 +134,7 @@ export default function OrderHistoryPage() {
     return () => {
       canceled = true;
     };
-  }, [idsKey]); // ✅ 배열 대신 string 키 의존
+  }, [idsKey]);
 
   return (
     <Page>
@@ -135,15 +162,22 @@ export default function OrderHistoryPage() {
       ) : (
         <List>
           {orders.map((o) => {
-            const stat = STATUS_MAP[o.customerOrder.status] || STATUS_MAP.PENDING;
-            const qty = Array.isArray(o.orderItems) ? o.orderItems.length : 0;
+            const stat =
+              STATUS_MAP[o.customerOrder.status] || STATUS_MAP.PENDING;
+            const qty = Array.isArray(o.orderItems)
+              ? o.orderItems.length
+              : 0;
             return (
               <Card key={o.orderId}>
                 <TopRow>
-                  <OrderTitle>{formatDate(o.customerOrder.created_at)} 주문</OrderTitle>
+                  <OrderTitle>
+                    {formatDate(o.customerOrder.created_at)} 주문
+                  </OrderTitle>
                   <Status>
                     <Dot style={{ background: stat.color }} />
-                    <StatusText style={{ color: stat.color }}>{stat.label}</StatusText>
+                    <StatusText style={{ color: stat.color }}>
+                      {stat.label}
+                    </StatusText>
                   </Status>
                 </TopRow>
 
@@ -152,7 +186,9 @@ export default function OrderHistoryPage() {
                 <MetaRow>
                   <MetaCol>
                     <MetaLabel>총 금액</MetaLabel>
-                    <MetaStrong>{(o.paymentInfo.amount || 0).toLocaleString()}원</MetaStrong>
+                    <MetaStrong>
+                      {(o.paymentInfo.amount || 0).toLocaleString()}원
+                    </MetaStrong>
                   </MetaCol>
 
                   <MetaColRight>
