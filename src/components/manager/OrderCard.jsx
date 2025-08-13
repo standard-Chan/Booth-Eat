@@ -23,14 +23,21 @@ export default function OrderCard({
   const isFinished = active && orderStatus === "FINISHED";
 
   const [checks, setChecks] = useState({});
+
   useEffect(() => {
     console.log(items);
     const init = {};
-    items.forEach((it, idx) => (init[idx] = false));
+    items.forEach((it, idx) => {
+      init[idx] = orderStatus === "FINISHED" ? true : false; // FINISHED면 전부 체크
+    });
     setChecks(init);
-  }, [items]);
+  }, [items, orderStatus]);
 
-  const toggleCheck = (idx) => setChecks((m) => ({ ...m, [idx]: !m[idx] }));
+  const toggleCheck = (idx) => {
+    // FINISHED 상태면 체크 변경 불가
+    if (orderStatus === "FINISHED") return;
+    setChecks((m) => ({ ...m, [idx]: !m[idx] }));
+  };
 
   return (
     <Card>
